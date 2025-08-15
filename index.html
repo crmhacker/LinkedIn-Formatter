@@ -3,74 +3,113 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CRM Hacker – LinkedIn Text Formatter | Salesforce & RevOps Post Styling</title>
-  <meta name="description" content="CRM Hacker LinkedIn text formatter for Salesforce & RevOps teams: bold, italic, underline, strikethrough, Unicode fonts, bullets, numbers, title case, staircase sorting, live LinkedIn preview, copy to clipboard, plus expert FAQs for Sales Cloud, CRM migrations, and enablement.">
-  <meta name="keywords" content="LinkedIn text formatter, Salesforce, RevOps, Sales Cloud, CRM migrations, revenue operations, LinkedIn formatting, Unicode bold, italics, strikethrough, CRM Hacker">
+  <title>CRM Hacker – LinkedIn Text Formatter | Clean & Readable</title>
+  <meta name="description" content="CRM Hacker LinkedIn text formatter: bold, italic, underline, strikethrough, Unicode fonts, bullets, numbers, title case, staircase sorting, live LinkedIn preview, copy to clipboard, plus expert FAQs.">
   <style>
     :root{
+      /* CRM Hacker soft theme */
       --accent:#ff2c2c; --accent-2:#ff5858;
-      --bg:#0b0c10; --bg-2:#0e1016;
-      --panel:#121318; --ink:#ffffff; --muted:#a9adba; --line:#24283b;
-      --ok:#18c37d; --warn:#ffb020; --li-blue:#0a66c2;
+      --bg:#f7f8fb;            /* soft off-white page background */
+      --panel:#ffffff;         /* cards */
+      --ink:#1b1f23;           /* primary text (dark gray) */
+      --muted:#5b6070;         /* secondary text */
+      --line:#e6e8ef;          /* borders on light */
+      --ok:#18c37d; --warn:#b25b00;
+      --li-blue:#0a66c2;
+      --highlight:#fff3f3;     /* subtle CRM-red tint for highlight box */
+      --highlight-border:#ffd9d9;
     }
-    *{box-sizing:border-box} html,body{height:100%}
-    body{margin:0;background:linear-gradient(180deg,var(--bg),var(--bg-2));color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    a{color:var(--accent)} .wrap{max-width:1280px;margin:28px auto;padding:0 16px}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--ink);
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    }
+    a{color:var(--accent)}
+    .wrap{max-width:1280px;margin:28px auto;padding:0 16px}
     .topbar{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-    .topbar img{height:54px;width:auto;background:#000;border-radius:10px;padding:3px;border:1px solid #2a2f47;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35))}
+    .topbar img{height:54px;width:auto;background:#000;border-radius:10px;padding:3px;border:1px solid #0001;box-shadow:0 2px 8px #00000014}
     .brand h1{margin:0;font-size:24px}
-    .tag{display:inline-flex;gap:8px;align-items:center;color:#ffd1d1;background:#170909;border:1px solid #3b0d0d;border-radius:999px;padding:6px 10px;font-size:12px}
-    .hero{margin:8px 0 18px;color:#dfe3ff;line-height:1.55}
+    .tag{display:inline-flex;gap:8px;align-items:center;color:#8a2b2b;background:#fff7f7;border:1px solid #ffdede;border-radius:999px;padding:6px 10px;font-size:12px}
+
     .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
     @media (max-width:1024px){.grid{grid-template-columns:1fr}}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 28px rgba(0,0,0,.35)}
-    .pad{padding:14px} .divider{height:1px;background:#1e2337;margin:12px 0}
-    textarea{width:100%;min-height:220px;background:#0b0d14;color:var(--ink);border:1px solid #25283a;border-radius:12px;padding:14px 16px;font-size:16px;outline:none;resize:vertical}
+
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 28px #00000010}
+    .pad{padding:14px}
+    .divider{height:1px;background:var(--line);margin:12px 0}
+
+    textarea{
+      width:100%;min-height:220px;background:#fcfcfe;color:var(--ink);
+      border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:16px;outline:none;resize:vertical;
+    }
     .muted{color:var(--muted);font-size:12px}
 
-    /* Toolbar */
+    /* Toolbar + buttons */
     .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .tool{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 10px;border:1px solid #2b3049;background:#0e1221;border-radius:10px;color:var(--ink);cursor:pointer}
-    .tool svg{width:18px;height:18px} .tool:hover{transform:translateY(-1px)}
+    .tool{
+      display:inline-flex;align-items:center;justify-content:center;gap:6px;
+      padding:9px 10px;border:1px solid var(--line);background:#fff;border-radius:10px;
+      color:var(--ink);cursor:pointer
+    }
+    .tool svg{width:18px;height:18px}
+    .tool:hover{transform:translateY(-1px);box-shadow:0 2px 8px #00000010}
     .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
-    .btn{background:#171a27;border:1px solid #2a2f47;color:var(--ink);padding:10px 12px;border-radius:12px;font-weight:600;cursor:pointer}
-    .btn:hover{transform:translateY(-1px);background:#1b1f31;border-color:#3b4262}
-    .btn.primary{background:var(--accent);border-color:var(--accent-2)} .btn.good{background:var(--ok);border-color:#27da97}
+    .btn{
+      background:#fff;border:1px solid var(--line);color:var(--ink);
+      padding:10px 12px;border-radius:12px;font-weight:600;cursor:pointer
+    }
+    .btn:hover{transform:translateY(-1px);box-shadow:0 2px 8px #00000010}
+    .btn.primary{background:var(--accent);border-color:var(--accent-2);color:#fff}
+    .btn.good{background:var(--ok);border-color:#27da97;color:#fff}
 
     /* Visual style palette */
     .palette{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px}
-    .chip{display:flex;align-items:center;gap:8px;padding:10px;border:1px solid #2a2f47;background:#0f1320;border-radius:10px;cursor:pointer}
+    .chip{display:flex;align-items:center;gap:8px;padding:10px;border:1px solid var(--line);background:#fff;border-radius:10px;cursor:pointer}
     .chip input{accent-color:var(--accent)}
-    .sample{margin-left:auto;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
+    .sample{margin-left:auto;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
+
+    /* Top recommendation highlight (shows above toolbar) */
+    .topReco{display:none;margin:8px 0 12px;background:var(--highlight);border:1px solid var(--highlight-border);
+      border-radius:12px;padding:12px 12px 10px}
+    .topRecoHeader{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+    .topRecoTitle{font-weight:800;color:#802525}
+    .topRecoBtns{margin-left:auto;display:flex;gap:8px}
+    .topRecoText{white-space:pre-wrap;word-break:break-word;background:#fff;border:1px dashed var(--line);
+      border-radius:8px;padding:10px}
 
     /* Preview (right) */
     .previewShell{padding:12px}
-    .preview{background:#fff;color:#111;border-radius:12px;overflow:hidden;border:1px solid #d2d6de}
+    .preview{background:#fff;color:#111;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
     .liTop{display:flex;gap:10px;align-items:flex-start;padding:12px}
     .liTop img{height:40px;width:40px;border-radius:50%;background:#000}
     .liName{font-weight:600} .liMeta{font-size:12px;color:#666}
     .liFollow{margin-left:auto;background:#0a66c2;color:#fff;border:0;border-radius:999px;padding:6px 10px;font-weight:600}
     .liBody{padding:0 12px 12px;white-space:pre-wrap;word-break:break-word}
     .liImage{width:100%;display:none;max-height:380px;object-fit:cover;background:#f5f6f8}
-    .liActions{display:flex;gap:18px;border-top:1px solid #eef1f5;padding:10px 12px;color:#5f6b7a;font-size:13px}
-    .deviceRow{display:flex;align-items:center;gap:10px;margin:8px 0 0} .deviceRow .chip{background:#0b0f1e}
-    .meter{height:8px;background:#0d1223;border-radius:999px;border:1px solid #232a43;overflow:hidden}
+    .liActions{display:flex;gap:18px;border-top:1px solid var(--line);padding:10px 12px;color:#5f6b7a;font-size:13px}
+    .deviceRow{display:flex;align-items:center;gap:10px;margin:8px 0 0}
+    .deviceRow .chip{background:#fff}
+
+    /* Character meter */
+    .meter{height:8px;background:#eef0f7;border-radius:999px;border:1px solid var(--line);overflow:hidden}
     .meter>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#ff9b73)}
 
-    /* Recommendations */
+    /* Recommendations grid (full list below editor) */
     .recoGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:8px}
-    .recoCard{background:#0f1320;border:1px solid #2a2f47;border-radius:12px;padding:10px}
+    .recoCard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px}
     .recoHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
     .recoTitle{font-weight:700} .recoDesc{color:var(--muted);font-size:12px}
-    .recoText{white-space:pre-wrap;word-break:break-word;background:#0b0d14;border:1px solid #25283a;border-radius:8px;padding:8px;margin:8px 0;max-height:160px;overflow:auto}
+    .recoText{white-space:pre-wrap;word-break:break-word;background:#fcfcfe;border:1px solid var(--line);border-radius:8px;padding:8px;margin:8px 0;max-height:160px;overflow:auto}
     .recoBtns{display:flex;gap:8px}
 
     /* FAQ accordion */
     .faq{margin-top:22px}
-    .faq h2{margin:0 0 10px} details{background:#0f1320;border:1px solid #2a2f47;border-radius:10px;margin:8px 0}
+    .faq h2{margin:0 0 10px} details{background:#fff;border:1px solid var(--line);border-radius:10px;margin:8px 0}
     summary{cursor:pointer;padding:12px 14px;font-weight:700}
-    details[open] summary{border-bottom:1px solid #2a2f47}
-    .faq-body{padding:12px 14px;color:#d7daea;line-height:1.55}
+    details[open] summary{border-bottom:1px solid var(--line)}
+    .faq-body{padding:12px 14px;color:#2d3340;line-height:1.55}
   </style>
 </head>
 <body>
@@ -83,23 +122,31 @@
       </div>
     </div>
 
-    <!-- Hero / value copy -->
-    <div class="card pad">
-      <p class="hero">
-        Format LinkedIn posts that <b>convert</b>—without fighting the editor. This free tool from <b>CRM Hacker</b> helps Salesforce and RevOps teams
-        style text (bold, italics, strikethrough, Unicode fonts, bullets, title case) and preview it exactly like LinkedIn. Perfect for
-        <b>Sales Cloud</b> launches, <b>CRM migrations</b>, revenue operations insights, partner announcements, enablement tips, and hiring posts.
-      </p>
-      <p class="hero" style="margin-top:-6px">
-        <b>Need it dialed to your niche?</b> If you want me to tune the FAQ copy for specific <b>CRM Hacker</b> keywords
-        (e.g., <b>Salesforce</b>, <b>RevOps</b>, <b>Sales Cloud</b>, <b>CRM migrations</b>), say the word and I’ll drop in an SEO-juiced version.
+    <!-- Hero (trimmed per your request) -->
+    <div class="card pad" style="margin-bottom:14px">
+      <p style="margin:0 0 6px;color:#2d3340">
+        Format LinkedIn posts that are clean, scannable, and on-brand—without fighting the editor. Paste your text, pick a style, preview, and copy.
       </p>
     </div>
 
     <div class="grid">
       <!-- LEFT: Editor + controls -->
       <div class="card pad">
-        <h3>Editor</h3>
+        <h3 style="margin-top:0">Editor</h3>
+
+        <!-- Top Recommendation highlight (appears after clicking Recommend) -->
+        <div id="topReco" class="topReco" role="region" aria-live="polite">
+          <div class="topRecoHeader">
+            <div class="topRecoTitle" id="topRecoTitle">Recommended format</div>
+            <div class="topRecoBtns">
+              <button class="btn" id="topRecoUse">Use this</button>
+              <button class="btn" id="topRecoCopy">Copy</button>
+            </div>
+          </div>
+          <div id="topRecoText" class="topRecoText"></div>
+        </div>
+
+        <!-- Toolbar -->
         <div class="toolbar" aria-label="toolbar" title="Apply to selection or whole text">
           <button class="tool" data-act="bold" title="Bold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 6h6a3 3 0 110 6H7zm0 6h7a3 3 0 110 6H7"/></svg></button>
           <button class="tool" data-act="italic" title="Italic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4h7M7 20h7M14 4L10 20"/></svg></button>
@@ -113,6 +160,7 @@
         </div>
 
         <div class="divider"></div>
+
         <textarea id="input" placeholder="Write or paste your post…">Busy ≠ productive. Especially in RevOps.
 Busy work. Busy work. Busy work.</textarea>
 
@@ -122,14 +170,14 @@ Busy work. Busy work. Busy work.</textarea>
           <span class="muted" id="counts">0 chars • 0 words</span>
         </div>
 
-        <!-- Visual style palette (shows how styles will look) -->
+        <!-- Visual style palette -->
         <div class="palette" id="fontsGrid"></div>
 
-        <!-- Recommendations -->
+        <!-- Full recommendations list renders here -->
         <div id="recoArea"></div>
 
         <div class="divider"></div>
-        <div class="groupTitle">Sort / Staircase</div>
+        <div class="groupTitle" style="display:flex;align-items:center;gap:6px;color:#2d3340;font-size:12px;margin:8px 0">Sort / Staircase</div>
         <div class="toolbar">
           <label class="chip"><input type="radio" name="sort" value="none" checked> None</label>
           <label class="chip"><input type="radio" name="sort" value="asc"> Short → Long</label>
@@ -156,7 +204,7 @@ Busy work. Busy work. Busy work.</textarea>
 
       <!-- RIGHT: LinkedIn preview -->
       <div class="card previewShell">
-        <h3>Preview</h3>
+        <h3 style="margin-top:0">Preview</h3>
         <div class="deviceRow">
           <label class="chip"><input type="radio" name="device" value="desktop" checked> Desktop</label>
           <label class="chip"><input type="radio" name="device" value="mobile"> Mobile</label>
@@ -186,19 +234,9 @@ Busy work. Busy work. Busy work.</textarea>
       </div>
     </div>
 
-    <!-- Body copy / positioning for SEO -->
-    <div class="card pad" style="margin-top:16px">
-      <h2 style="margin:0 0 6px">Why format with CRM Hacker?</h2>
-      <p class="hero" style="margin:0">
-        We’re a Salesforce-first RevOps consultancy. This formatter reflects how we write for <b>Sales Cloud</b> rollouts,
-        <b>CRM migrations</b>, pipeline hygiene updates, partner enablement, and <b>revenue operations</b> playbooks—concise hooks,
-        scannable lists, and clean CTAs that move deals forward.
-      </p>
-    </div>
-
     <!-- FAQs -->
     <div class="card pad faq">
-      <h2>LinkedIn Text Formatting FAQs (CRM Hacker)</h2>
+      <h2 style="margin-top:0">LinkedIn Text Formatting FAQs (CRM Hacker)</h2>
 
       <details><summary>What’s the best way to format LinkedIn posts for reach and readability?</summary>
         <div class="faq-body">Lead with a <b>2–3 line hook</b>, keep lines short (40–80 chars), use <b>white space</b>, prefer
@@ -208,7 +246,7 @@ Busy work. Busy work. Busy work.</textarea>
 
       <details><summary>Bold vs Italic vs Strikethrough — when should I use each?</summary>
         <div class="faq-body"><b>Bold</b> for key outcomes, numbers, and CTAs. <i>Italic</i> for nuance or subtext.
-        <span style="text-decoration:line-through">Strikethrough</span> for contrast, humor, and pattern break (use sparingly, ideally per-sentence).</div>
+        <span style="text-decoration:line-through">Strikethrough</span> for contrast, humor, and pattern break (use sparingly).</div>
       </details>
 
       <details><summary>Do special fonts (script, fraktur, double-struck) hurt performance?</summary>
@@ -221,19 +259,9 @@ Busy work. Busy work. Busy work.</textarea>
         Include <b>2–5 relevant hashtags</b> at the end (niche + category).</div>
       </details>
 
-      <details><summary>How do I format case (UPPER, Title Case, etc.) for impact?</summary>
-        <div class="faq-body">Use <b>Title Case</b> for headings and hooks. <b>UPPERCASE</b> only for short callouts or acronyms.
-        Avoid long blocks in UPPER — it feels shouty and reduces readability.</div>
-      </details>
-
       <details><summary>When should I format lists vs paragraphs?</summary>
         <div class="faq-body">Use <b>bullets</b> when listing benefits, steps, or insights (3–7 bullets). Use a short paragraph when telling a story
         or making a single point. You can mix them: short para → bullets → CTA.</div>
-      </details>
-
-      <details><summary>Best LinkedIn hashtags for Salesforce & RevOps content?</summary>
-        <div class="faq-body">Place hashtags at the <b>end</b>. Mix: niche (#RevOps, #SalesforceAdmin, #SalesCloud),
-        category (#B2BMarketing, #SaaS, #RevenueOperations), and optionally branded <b>#CRMHacker</b>.</div>
       </details>
 
       <details><summary>How do I preview mobile vs desktop formatting?</summary>
@@ -261,6 +289,8 @@ Busy work. Busy work. Busy work.</textarea>
   // Elements
   const input = $('#input'), liBody = $('#liBody');
   const meterBar = $('#meterBar'), limitInfo = $('#limitInfo');
+  const topReco = $('#topReco'), topRecoText = $('#topRecoText'), topRecoTitle = $('#topRecoTitle');
+  const topRecoUse = $('#topRecoUse'), topRecoCopy = $('#topRecoCopy');
 
   const LINKEDIN_LIMIT = 3000;
 
@@ -330,7 +360,7 @@ Busy work. Busy work. Busy work.</textarea>
     row.append(rb, txt, sample); fontsGrid.appendChild(row);
   });
 
-  // ===== Text actions (selection-aware)
+  // ===== Selection-aware text actions
   function applyToSelection(fn){
     const el = input; const start = el.selectionStart, end = el.selectionEnd;
     if(start !== end){
@@ -364,19 +394,18 @@ Busy work. Busy work. Busy work.</textarea>
   // Main formatter
   function runFormat(){
     let s = input.value || '';
-    // case (simple demo: you can add toggles later if you want)
-    // sort
     const sortMode = ($('input[name="sort"]:checked')||{}).value || 'none';
     s = sortLines(s, sortMode);
-    // font map
+
     const font = ($('input[name="font"]:checked')||{}).value;
     if(font) s = mapRun(s, font);
-    // overlays
+
     const marks=[]; if($('#ovStrike').checked) marks.push(CM.strike); if($('#ovUnder').checked) marks.push(CM.underline); if($('#ovOver').checked) marks.push(CM.overline); if($('#ovSlash').checked) marks.push(CM.slash); if($('#ovWavy').checked) marks.push(CM.wavy); if($('#ovDot').checked) marks.push(CM.dot); if($('#ovRing').checked) marks.push(CM.ring);
     if($('#sentStrike').checked && marks.includes(CM.strike)){
       s = [...s].map(ch=> (ch===' '||ch==='\n')? ch : ch+CM.strike).join('');
       s = overlay(s, marks.filter(m=>m!==CM.strike));
     } else if(marks.length){ s = overlay(s, marks); }
+
     liBody.textContent = s; updateCounts();
   }
 
@@ -397,40 +426,53 @@ Busy work. Busy work. Busy work.</textarea>
     variants.push({ label:'Cursive', desc:'Script for taglines', text: mapRun(src,'scriptBold') });
     return variants;
   }
+
+  function renderTopRecommendation(item){
+    if(!item){ topReco.style.display='none'; return; }
+    topRecoTitle.textContent = `Recommended format — ${item.label}`;
+    topRecoText.textContent = item.text;
+    topReco.style.display = 'block';
+    topRecoUse.onclick = ()=>{ liBody.textContent = item.text; window.scrollTo({top:0,behavior:'smooth'}); };
+    topRecoCopy.onclick = async ()=>{ await navigator.clipboard.writeText(item.text); topRecoCopy.textContent='Copied!'; setTimeout(()=> topRecoCopy.textContent='Copy', 900); };
+  }
+
   function renderRecommendations(list){
     const host = $('#recoArea'); if (!list || !list.length){ host.innerHTML = ''; return; }
-    host.innerHTML = `<div class="groupTitle">Recommended formatting</div>
-      <div class="recoGrid">
-        ${list.map((v,i)=>`
-          <div class="recoCard">
-            <div class="recoHead"><div class="recoTitle">${v.label}</div></div>
-            <div class="recoDesc">${v.desc}</div>
-            <div class="recoText" id="recoText_${i}">${v.text}</div>
-            <div class="recoBtns">
-              <button class="btn" data-use="${i}">Use this</button>
-              <button class="btn" data-copy="${i}">Copy</button>
-            </div>
-          </div>`).join('')}
-      </div>`;
-    host.querySelectorAll('[data-use]').forEach(btn=>{
-      btn.addEventListener('click', e=>{
-        const idx = +e.currentTarget.dataset.use;
-        liBody.textContent = list[idx].text;
+    // show top recommendation above toolbar
+    renderTopRecommendation(list[0]);
+
+    // render the rest as cards
+    const rest = list.slice(1);
+    host.innerHTML = rest.length ? (`<div class="recoGrid">
+      ${rest.map((v,i)=>`
+        <div class="recoCard">
+          <div class="recoHead"><div class="recoTitle">${v.label}</div></div>
+          <div class="recoDesc">${v.desc}</div>
+          <div class="recoText">${v.text}</div>
+          <div class="recoBtns">
+            <button class="btn" data-use="${i}">Use this</button>
+            <button class="btn" data-copy="${i}">Copy</button>
+          </div>
+        </div>`).join('')}
+    </div>`) : '<div class="muted">No more suggestions.</div>';
+
+    host.querySelectorAll('[data-use]').forEach((btn,idx)=>{
+      btn.addEventListener('click', ()=>{
+        const v = rest[idx]; liBody.textContent = v.text;
       });
     });
-    host.querySelectorAll('[data-copy]').forEach(btn=>{
-      btn.addEventListener('click', async e=>{
-        const idx = +e.currentTarget.dataset.copy;
-        await navigator.clipboard.writeText(list[idx].text);
-        e.currentTarget.textContent = 'Copied!';
-        setTimeout(()=> e.currentTarget.textContent='Copy', 900);
+    host.querySelectorAll('[data-copy]').forEach((btn,idx)=>{
+      btn.addEventListener('click', async ()=>{
+        const v = rest[idx]; await navigator.clipboard.writeText(v.text);
+        btn.textContent='Copied!'; setTimeout(()=> btn.textContent='Copy', 900);
       });
     });
   }
 
   // Image + device
   $('#imagePick').addEventListener('change', (e)=>{
-    const f = e.target.files?.[0]; if(!f) return; const url = URL.createObjectURL(f); const im = $('#liImage'); im.src=url; im.style.display='block';
+    const f = e.target.files?.[0]; if(!f) return; const url = URL.createObjectURL(f);
+    const im = $('#liImage'); im.src=url; im.style.display='block';
   });
   $$('input[name="device"]').forEach(rb=> rb.addEventListener('change',()=>{
     const box=$('#preview'); box.style.maxWidth = rb.value==='mobile'? '420px':'760px';
@@ -438,10 +480,15 @@ Busy work. Busy work. Busy work.</textarea>
 
   // Wire buttons
   $('#formatBtn').addEventListener('click', runFormat);
-  $('#recommendBtn').addEventListener('click', ()=> renderRecommendations(recommendVariants(input.value||'')));
+  $('#recommendBtn').addEventListener('click', ()=>{
+    const recos = recommendVariants(input.value||''); renderRecommendations(recos);
+    // scroll to just above toolbar so the top box is visible on mobile
+    document.querySelector('.toolbar').scrollIntoView({behavior:'smooth', block:'start'});
+  });
   $('#copyBtn').addEventListener('click', ()=> navigator.clipboard.writeText(liBody.textContent||''));
 
   // Init
+  function toTitle(s){return s.toLowerCase().replace(/\b([a-z])(\w*)/g,(_,h,rest)=>h.toUpperCase()+rest);}
   updateCounts(); runFormat();
 </script>
 </body>
