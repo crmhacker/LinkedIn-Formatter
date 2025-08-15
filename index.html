@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CRM Hacker – LinkedIn Text Formatter</title>
-  <meta name="description" content="LinkedIn text formatter for CRM Hacker: bold, italic, underline, strikethrough, Unicode fonts, overlays, tiny/sub/sup, title/upper/lowercase, staircase sorting, live LinkedIn preview, recommendations, copy to clipboard.">
+  <meta name="description" content="LinkedIn text formatter for CRM Hacker: bold, italic, underline, strikethrough, Unicode fonts, overlays, tiny/sub/sup, title/upper/lowercase, staircase sorting, live LinkedIn preview, recommendations, copy, schedule & post.">
   <style>
     :root{
       --accent:#ff2c2c; --accent-2:#ff5858;
@@ -47,6 +47,7 @@
     .btn:hover{background:#eee}
     .btn.primary{background:var(--accent);border-color:var(--accent-2);color:#fff}
     .btn.good{background:var(--ok);border-color:#27da97;color:#fff}
+    .btn.link{background:#fff;border:1px dashed var(--line)}
 
     .toolbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
     .chip{
@@ -82,6 +83,15 @@
 
     .meter{height:8px;background:#eee;border-radius:999px;border:1px solid #ddd;overflow:hidden}
     .meter>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#ff9b73)}
+
+    /* Toolkit picker show/hide */
+    .toolset{display:none}
+    .toolset.active{display:block}
+
+    /* Schedule panel */
+    .schedule{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px;padding:10px;border:1px dashed var(--line);border-radius:10px;background:#fff}
+    .schedule input[type="datetime-local"]{border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+    .tz{font-size:12px;color:var(--muted)}
   </style>
 </head>
 <body>
@@ -113,55 +123,97 @@
           <span class="muted" id="counts">0 chars • 0 words</span>
         </div>
 
+        <!-- Schedule & Post -->
+        <div class="schedule">
+          <strong>Schedule & Post</strong>
+          <input id="postWhen" type="datetime-local">
+          <span class="tz" id="tzInfo"></span>
+          <button class="btn" id="postNowBtn">Post Now (LinkedIn)</button>
+          <button class="btn link" id="icsBtn">Add to Calendar (.ics)</button>
+        </div>
+
         <div class="divider"></div>
 
-        <!-- TOGGLE FORMATTING (reversible) -->
-        <div class="groupTitle">Formatting (toggle on/off)</div>
-        <div class="toolbar">
-          <label class="chip"><input type="checkbox" id="stBold"> Bold</label>
-          <label class="chip"><input type="checkbox" id="stItalic"> Italic</label>
-          <label class="chip"><input type="checkbox" id="stBullets"> Bulleted list</label>
-          <label class="chip"><input type="checkbox" id="stNumbers"> Numbered list</label>
-          <label class="chip"><input type="checkbox" id="stQuote"> Quote lines</label>
+        <!-- Toolkit picker -->
+        <div class="controls" style="margin-top:0">
+          <label class="chip" style="background:#fff">
+            <span>Format Toolkit:</span>
+            <select id="toolkitPick" style="border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:#fff;margin-left:6px">
+              <option value="all" selected>All Tools</option>
+              <option value="basic">Basic Styles</option>
+              <option value="lists">Lists & Quotes</option>
+              <option value="fonts">Fancy Fonts</option>
+              <option value="transform">Text Transforms</option>
+              <option value="sort">Sorting</option>
+              <option value="overlays">Overlays</option>
+            </select>
+          </label>
         </div>
 
-        <!-- Fancy fonts palette -->
-        <div class="groupTitle">Fancy fonts (Unicode)</div>
-        <div class="palette" id="fontsGrid"></div>
-
-        <!-- Text transforms -->
-        <div class="groupTitle">Text transforms</div>
-        <div class="toolbar">
-          <label class="chip"><input type="checkbox" id="upper"> UPPER</label>
-          <label class="chip"><input type="checkbox" id="lower"> lower</label>
-          <label class="chip"><input type="checkbox" id="title"> Title Case</label>
-          <label class="chip"><input type="checkbox" id="tiny"> Tiny</label>
-          <label class="chip"><input type="checkbox" id="sub"> Sub</label>
-          <label class="chip"><input type="checkbox" id="sup"> Sup</label>
-          <label class="chip"><input type="checkbox" id="clean"> Remove marks</label>
+        <!-- BASIC STYLES -->
+        <div class="toolset active" data-set="basic" id="set_basic">
+          <div class="groupTitle">Basic Styles (toggle on/off)</div>
+          <div class="toolbar">
+            <label class="chip"><input type="checkbox" id="stBold"> Bold</label>
+            <label class="chip"><input type="checkbox" id="stItalic"> Italic</label>
+          </div>
         </div>
 
-        <!-- Sorting / Staircase -->
-        <div class="groupTitle">Sort / Staircase</div>
-        <div class="toolbar">
-          <label class="chip"><input type="radio" name="sort" value="none" checked> None</label>
-          <label class="chip"><input type="radio" name="sort" value="asc"> Short → Long</label>
-          <label class="chip"><input type="radio" name="sort" value="desc"> Long → Short</label>
-          <label class="chip"><input type="radio" name="sort" value="stair"> Staircase (S-L-S)</label>
-          <span class="muted">Reorders by line length.</span>
+        <!-- LISTS & QUOTES -->
+        <div class="toolset active" data-set="lists" id="set_lists">
+          <div class="groupTitle">Lists & Quotes</div>
+          <div class="toolbar">
+            <label class="chip"><input type="checkbox" id="stBullets"> Bulleted list</label>
+            <label class="chip"><input type="checkbox" id="stNumbers"> Numbered list</label>
+            <label class="chip"><input type="checkbox" id="stQuote"> Quote lines</label>
+          </div>
         </div>
 
-        <!-- Overlays -->
-        <div class="groupTitle">Overlays</div>
-        <div class="toolbar">
-          <label class="chip"><input type="checkbox" id="ovStrike"> Strikethrough</label>
-          <label class="chip"><input type="checkbox" id="ovUnder"> Underline</label>
-          <label class="chip"><input type="checkbox" id="ovOver"> Overline</label>
-          <label class="chip"><input type="checkbox" id="ovSlash"> Slash</label>
-          <label class="chip"><input type="checkbox" id="ovWavy"> Wavy</label>
-          <label class="chip"><input type="checkbox" id="ovDot"> Dot above</label>
-          <label class="chip"><input type="checkbox" id="ovRing"> Ring above</label>
-          <label class="chip"><input type="checkbox" id="sentStrike"> Strike per sentence</label>
+        <!-- FANCY FONTS -->
+        <div class="toolset active" data-set="fonts" id="set_fonts">
+          <div class="groupTitle">Fancy fonts (Unicode)</div>
+          <div class="palette" id="fontsGrid"></div>
+        </div>
+
+        <!-- TEXT TRANSFORMS -->
+        <div class="toolset active" data-set="transform" id="set_transform">
+          <div class="groupTitle">Text transforms</div>
+          <div class="toolbar">
+            <label class="chip"><input type="checkbox" id="upper"> UPPER</label>
+            <label class="chip"><input type="checkbox" id="lower"> lower</label>
+            <label class="chip"><input type="checkbox" id="title"> Title Case</label>
+            <label class="chip"><input type="checkbox" id="tiny"> Tiny</label>
+            <label class="chip"><input type="checkbox" id="sub"> Sub</label>
+            <label class="chip"><input type="checkbox" id="sup"> Sup</label>
+            <label class="chip"><input type="checkbox" id="clean"> Remove marks</label>
+          </div>
+        </div>
+
+        <!-- SORTING -->
+        <div class="toolset active" data-set="sort" id="set_sort">
+          <div class="groupTitle">Sort / Staircase</div>
+          <div class="toolbar">
+            <label class="chip"><input type="radio" name="sort" value="none" checked> None</label>
+            <label class="chip"><input type="radio" name="sort" value="asc"> Short → Long</label>
+            <label class="chip"><input type="radio" name="sort" value="desc"> Long → Short</label>
+            <label class="chip"><input type="radio" name="sort" value="stair"> Staircase (S-L-S)</label>
+            <span class="muted">Reorders by line length.</span>
+          </div>
+        </div>
+
+        <!-- OVERLAYS -->
+        <div class="toolset active" data-set="overlays" id="set_overlays">
+          <div class="groupTitle">Overlays</div>
+          <div class="toolbar">
+            <label class="chip"><input type="checkbox" id="ovStrike"> Strikethrough</label>
+            <label class="chip"><input type="checkbox" id="ovUnder"> Underline</label>
+            <label class="chip"><input type="checkbox" id="ovOver"> Overline</label>
+            <label class="chip"><input type="checkbox" id="ovSlash"> Slash</label>
+            <label class="chip"><input type="checkbox" id="ovWavy"> Wavy</label>
+            <label class="chip"><input type="checkbox" id="ovDot"> Dot above</label>
+            <label class="chip"><input type="checkbox" id="ovRing"> Ring above</label>
+            <label class="chip"><input type="checkbox" id="sentStrike"> Strike per sentence</label>
+          </div>
         </div>
 
         <div class="divider"></div>
@@ -207,6 +259,10 @@
   const input = $('#input'), liBody = $('#liBody');
   const meterBar = $('#meterBar'), limitInfo = $('#limitInfo');
   const LINKEDIN_LIMIT = 3000;
+
+  // Timezone display
+  const tzName = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local';
+  $('#tzInfo').textContent = `Timezone: ${tzName}`;
 
   function updateCounts(){
     const text = input.value;
@@ -423,6 +479,26 @@
   });
   $('#copyBtn').addEventListener('click', ()=> navigator.clipboard.writeText(liBody.textContent||''));
 
+  // Toolkit picker show/hide logic
+  const toolsets = {
+    all: ['basic','lists','fonts','transform','sort','overlays'],
+    basic: ['basic'],
+    lists: ['lists'],
+    fonts: ['fonts'],
+    transform: ['transform'],
+    sort: ['sort'],
+    overlays: ['overlays']
+  };
+  function renderToolkit(value){
+    const wanted = new Set(toolsets[value] || toolsets.all);
+    $$('.toolset').forEach(div=>{
+      const key = div.getAttribute('data-set');
+      div.classList.toggle('active', wanted.has(key));
+    });
+  }
+  $('#toolkitPick').addEventListener('change', e=> renderToolkit(e.target.value));
+  renderToolkit('all');
+
   // Live reformat on toggle/radio change
   const liveSelectors = [
     'input[name="sort"]','input[name="font"]',
@@ -431,6 +507,90 @@
     '#ovStrike','#ovUnder','#ovOver','#ovSlash','#ovWavy','#ovDot','#ovRing','#sentStrike'
   ];
   $$(liveSelectors.join(',')).forEach(el=> el.addEventListener('change', runFormat));
+
+  // ====== Schedule & Post ======
+  function openLinkedInComposerWithClipboard(){
+    const text = liBody.textContent || input.value || '';
+    if(!text.trim()){ alert('Write or format something first.'); return; }
+
+    // Try Web Share on supported devices (may allow direct share of text)
+    if(navigator.share){
+      navigator.share({ text })
+        .catch(()=>{/* ignore user cancel */})
+        .finally(()=>{
+          // Also copy for safety and open LinkedIn feed
+          navigator.clipboard.writeText(text).finally(()=>{
+            window.open('https://www.linkedin.com/feed/?shareActive=true','_blank','noopener');
+          });
+        });
+    } else {
+      // Fallback: copy text, then open LinkedIn
+      navigator.clipboard.writeText(text).finally(()=>{
+        window.open('https://www.linkedin.com/feed/?shareActive=true','_blank','noopener');
+        alert('Your text is copied. Paste it into the LinkedIn composer.');
+      });
+    }
+  }
+
+  function pad(n){return String(n).padStart(2,'0');}
+  function toICSDate(dt){
+    // Convert local Date to UTC ICS timestamp YYYYMMDDTHHMMSSZ
+    const y = dt.getUTCFullYear();
+    const m = pad(dt.getUTCMonth()+1);
+    const d = pad(dt.getUTCDate());
+    const hh = pad(dt.getUTCHours());
+    const mm = pad(dt.getUTCMinutes());
+    const ss = pad(dt.getUTCSeconds());
+    return `${y}${m}${d}T${hh}${mm}${ss}Z`;
+  }
+
+  function downloadICS(){
+    const text = (liBody.textContent || input.value || '').trim();
+    if(!text){ alert('Nothing to schedule. Add some text first.'); return; }
+
+    const raw = $('#postWhen').value;
+    if(!raw){ alert('Pick a date/time first.'); return; }
+
+    // Local datetime -> Date
+    const when = new Date(raw);
+    if(isNaN(when.getTime())){ alert('Invalid date/time.'); return; }
+
+    // Default 30 minutes duration
+    const end = new Date(when.getTime() + 30*60*1000);
+
+    const uid = 'crm-hacker-' + Date.now() + '@formatter';
+    const dtstamp = toICSDate(new Date());
+    const dtstart = toICSDate(when);
+    const dtend = toICSDate(end);
+
+    const ics =
+`BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//CRM Hacker//LinkedIn Formatter//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:${uid}
+DTSTAMP:${dtstamp}
+DTSTART:${dtstart}
+DTEND:${dtend}
+SUMMARY:Post on LinkedIn (CRM Hacker)
+DESCRIPTION:${text.replace(/\n/g,'\\n').replace(/,/g,'\\,')}
+END:VEVENT
+END:VCALENDAR`;
+
+    const blob = new Blob([ics], {type:'text/calendar'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'linkedin-post.crmhacker.ics';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
+  }
+
+  $('#postNowBtn').addEventListener('click', openLinkedInComposerWithClipboard);
+  $('#icsBtn').addEventListener('click', downloadICS);
 
   // Init
   updateCounts(); runFormat();
