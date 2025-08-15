@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CRM Hacker – LinkedIn Text Formatter</title>
-  <meta name="description" content="LinkedIn text formatter for CRM Hacker: bold, italic, underline, strikethrough, Unicode fonts, overlays, tiny/sub/sup, title/upper/lowercase, staircase sorting, live LinkedIn preview, recommendations, copy, schedule & post.">
+  <meta name="description" content="LinkedIn text formatter for CRM Hacker: bold, italic, underline, strikethrough, Unicode fonts, overlays, tiny/sub/sup, title/upper/lowercase, staircase sorting, live LinkedIn preview, recommendations, copy, schedule & post, randomize variants.">
   <style>
     :root{
       --accent:#ff2c2c; --accent-2:#ff5858;
@@ -84,11 +84,9 @@
     .meter{height:8px;background:#eee;border-radius:999px;border:1px solid #ddd;overflow:hidden}
     .meter>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#ff9b73)}
 
-    /* Toolkit picker show/hide */
     .toolset{display:none}
     .toolset.active{display:block}
 
-    /* Schedule panel */
     .schedule{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px;padding:10px;border:1px dashed var(--line);border-radius:10px;background:#fff}
     .schedule input[type="datetime-local"]{border:1px solid var(--line);border-radius:8px;padding:6px 8px}
     .tz{font-size:12px;color:var(--muted)}
@@ -119,6 +117,7 @@
         <div class="controls">
           <button class="btn primary" id="formatBtn">Format → Preview</button>
           <button class="btn" id="recommendBtn">Recommend Formatting</button>
+          <button class="btn" id="randomBtn">Randomize</button>
           <button class="btn" id="clearBtn">Clear Formatting</button>
           <span class="muted" id="counts">0 chars • 0 words</span>
         </div>
@@ -128,7 +127,7 @@
           <strong>Schedule & Post</strong>
           <input id="postWhen" type="datetime-local">
           <span class="tz" id="tzInfo"></span>
-          <button class="btn" id="postNowBtn">Post Now (LinkedIn)</button>
+          <button class="btn" id="postNowBtn">Post / Schedule on LinkedIn</button>
           <button class="btn link" id="icsBtn">Add to Calendar (.ics)</button>
         </div>
 
@@ -377,9 +376,57 @@
     updateCounts();
   }
 
-  // Recommendations (multi-option grid)
+  // ===== Randomize variant generator =====
+  function randPick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  function coin(p=0.5){ return Math.random()<p; }
   function looksLikeList(s){ return /^\s*[-•\d]/m.test(s) || s.split('\n').filter(x=>x.trim()).length >= 3; }
   function toBullets(s){ return s.split(/\n/).map(l=> l.trim()? '• '+l.replace(/^([•\-\*\d\.]+\s*)/,'') : '').join('\n'); }
+
+  function randomizeFrom(src){
+    let s = src || '';
+    if(!s.trim()) return s;
+
+    // Optional case
+    const caseOps = [null,'upper','lower','title'];
+    const chosenCase = randPick(caseOps);
+    if(chosenCase==='upper') s = s.toUpperCase();
+    else if(chosenCase==='lower') s = s.toLowerCase();
+    else if(chosenCase==='title') s = toTitle(s);
+
+    // Maybe list/quote
+    if(looksLikeList(s) && coin(.7)){
+      s = coin(.6) ? applyNumbers(s) : applyBullets(s);
+    }
+    if(coin(.3)) s = applyQuotes(s);
+
+    // Font (lightweight random)
+    const fontOps = [null,'bold','italic','smallcaps','mono','scriptBold','sans','sansBold'];
+    const f = randPick(fontOps);
+    if(f) s = mapRun(s,f);
+
+    // Tiny/Sub/Sup (rare)
+    const tsOps = [null,'tiny','sub','sup',null,null];
+    const ts = randPick(tsOps);
+    if(ts==='tiny') s = transformWithMap(s, tinyMap);
+    else if(ts==='sub') s = transformWithMap(s, subMap);
+    else if(ts==='sup') s = transformWithMap(s, supMap);
+
+    // Overlays subset
+    let marks=[];
+    if(coin(.25)) marks.push(CM.underline);
+    if(coin(.15)) marks.push(CM.strike);
+    if(coin(.10)) marks.push(CM.overline);
+    if(coin(.10)) marks.push(CM.dot);
+    if(coin(.08)) marks.push(CM.ring);
+    if(coin(.06)) marks.push(CM.wavy);
+    if(coin(.05)) marks.push(CM.slash);
+    if(coin(.05)) s = sentenceStrike(s); // per-sentence strike
+    if(marks.length) s = overlay(s, marks);
+
+    return s;
+  }
+
+  // ===== Recommendations (multi-option grid)
   function recommendVariants(src){
     const variants = [];
     variants.push({ label:'Headline', desc:'Bold + Title Case for hooks', text: mapRun(toTitle(src),'bold') });
@@ -466,6 +513,14 @@
     renderRecommendations(recommendVariants(input.value||''));
     input.scrollIntoView({behavior:'smooth', block:'center'});
   });
+  $('#randomBtn').addEventListener('click', ()=>{
+    const base = input.value || '';
+    if(!base.trim()){ alert('Add some text first.'); return; }
+    const v = randomizeFrom(base);
+    liBody.textContent = v;
+    // also keep counts in sync
+    updateCounts();
+  });
   $('#clearBtn').addEventListener('click', ()=>{
     input.value='';
     liBody.textContent='';
@@ -513,28 +568,31 @@
     const text = liBody.textContent || input.value || '';
     if(!text.trim()){ alert('Write or format something first.'); return; }
 
-    // Try Web Share on supported devices (may allow direct share of text)
+    // Try Web Share (mobile/tablet)
+    const openComposer = ()=>{
+      // Open feed composer; user can click the clock icon to schedule
+      window.open('https://www.linkedin.com/feed/?shareActive=true','_blank','noopener');
+    };
+
     if(navigator.share){
       navigator.share({ text })
-        .catch(()=>{/* ignore user cancel */})
+        .catch(()=>{/* ignore */})
         .finally(()=>{
-          // Also copy for safety and open LinkedIn feed
           navigator.clipboard.writeText(text).finally(()=>{
-            window.open('https://www.linkedin.com/feed/?shareActive=true','_blank','noopener');
+            openComposer();
+            setTimeout(()=>alert('Your text is copied. In the LinkedIn composer, click the “Schedule” (clock) icon to pick date & time.'), 300);
           });
         });
     } else {
-      // Fallback: copy text, then open LinkedIn
       navigator.clipboard.writeText(text).finally(()=>{
-        window.open('https://www.linkedin.com/feed/?shareActive=true','_blank','noopener');
-        alert('Your text is copied. Paste it into the LinkedIn composer.');
+        openComposer();
+        setTimeout(()=>alert('Your text is copied. In the LinkedIn composer, click the “Schedule” (clock) icon to pick date & time.'), 300);
       });
     }
   }
 
   function pad(n){return String(n).padStart(2,'0');}
   function toICSDate(dt){
-    // Convert local Date to UTC ICS timestamp YYYYMMDDTHHMMSSZ
     const y = dt.getUTCFullYear();
     const m = pad(dt.getUTCMonth()+1);
     const d = pad(dt.getUTCDate());
@@ -551,11 +609,9 @@
     const raw = $('#postWhen').value;
     if(!raw){ alert('Pick a date/time first.'); return; }
 
-    // Local datetime -> Date
     const when = new Date(raw);
     if(isNaN(when.getTime())){ alert('Invalid date/time.'); return; }
 
-    // Default 30 minutes duration
     const end = new Date(when.getTime() + 30*60*1000);
 
     const uid = 'crm-hacker-' + Date.now() + '@formatter';
