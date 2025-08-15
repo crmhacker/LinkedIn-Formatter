@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CRM Hacker – LinkedIn Text Formatter</title>
-  <meta name="description" content="LinkedIn text formatter for CRM Hacker: bold, italic, underline, strikethrough, Unicode fonts, overlays, tiny/sub/sup, title/upper/lowercase, staircase sorting, selection-aware inline tools, live LinkedIn preview, recommendations, copy, schedule & post, randomize variants.">
+  <meta name="description" content="LinkedIn text formatter for CRM Hacker: selection-aware toggles, bold/italic/underline/strike, lists, quotes, Unicode fonts, overlays, transforms, sorting, recommendations, randomize, copy, schedule & post, mobile responsive.">
   <style>
     :root{
       --accent:#ff2c2c; --accent-2:#ff5858;
@@ -112,7 +112,6 @@
     .toolset{display:none}
     .toolset.active{display:block}
 
-    /* Schedule block (RIGHT column, own section above Preview header) */
     .schedule{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px 0;padding:10px;border:1px dashed var(--line);border-radius:10px;background:#fff}
     .schedule input[type="datetime-local"]{border:1px solid var(--line);border-radius:8px;padding:6px 8px}
     .tz{font-size:12px;color:var(--muted)}
@@ -137,28 +136,24 @@
       <div class="card pad">
         <h3 style="margin-top:0">Editor</h3>
 
-        <!-- Selection-aware mini toolbar -->
+        <!-- Selection-aware mini toolbar (true toggles) -->
         <div class="miniTools" aria-label="inline tools">
           <button class="miniBtn" data-act="bold">B</button>
-          <button class="miniBtn" data-act="italic"><i>I</i></button>
+          <button class="miniBtn" data-act="italic"><span style="font-style:italic">I</span></button>
           <button class="miniBtn" data-act="underline"><u>U</u></button>
           <button class="miniBtn" data-act="strike"><s>S</s></button>
-          <button class="miniBtn" data-act="bullets">• List</button>
           <button class="miniBtn" data-act="numbers">1. List</button>
+          <button class="miniBtn" data-act="bullets">• List</button>
           <button class="miniBtn" data-act="quote">“Quote”</button>
-          <button class="miniBtn" data-act="upper">UPPER</button>
-          <button class="miniBtn" data-act="lower">lower</button>
-          <button class="miniBtn" data-act="title">Title</button>
-          <button class="miniBtn" data-act="tiny">Tiny</button>
-          <button class="miniBtn" data-act="sub">Sub</button>
-          <button class="miniBtn" data-act="sup">Sup</button>
           <select id="fontSel" class="miniSelect" title="Font for selection">
             <option value="">Font → selection</option>
           </select>
+          <button class="miniBtn" data-act="tiny">Tiny</button>
+          <button class="miniBtn" data-act="sub">Sub</button>
+          <button class="miniBtn" data-act="sup">Sup</button>
           <button class="miniBtn" data-act="clear">Clear</button>
         </div>
 
-        <!-- Textarea -->
         <textarea id="input" placeholder="Enter your text to format here..."></textarea>
 
         <!-- Recommendations (beneath textarea) -->
@@ -263,7 +258,6 @@
 
       <!-- RIGHT: Post actions (own section) + Preview -->
       <div class="card previewShell">
-        <!-- OWN SECTION: Schedule & Post (moved above Preview header) -->
         <div class="schedule">
           <strong>Schedule & Post</strong>
           <input id="postWhen" type="datetime-local">
@@ -312,7 +306,6 @@
   const meterBar = $('#meterBar'), limitInfo = $('#limitInfo');
   const LINKEDIN_LIMIT = 3000;
 
-  // Timezone display
   const tzName = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local';
   $('#tzInfo').textContent = `Timezone: ${tzName}`;
 
@@ -328,7 +321,7 @@
   }
   input.addEventListener('input', updateCounts);
 
-  // ===== Unicode maps
+  // ===== Unicode maps & reverse maps
   const A='ABCDEFGHIJKLMNOPQRSTUVWXYZ', a='abcdefghijklmnopqrstuvwxyz', D='0123456789';
   const buildMap=(U,L,N)=>{const m=new Map(); if(U!=null)for(let i=0;i<26;i++)m.set(A[i],String.fromCodePoint(U+i)); if(L!=null)for(let i=0;i<26;i++)m.set(a[i],String.fromCodePoint(L+i)); if(N!=null)for(let i=0;i<10;i++)m.set(D[i],String.fromCodePoint(N+i)); return m;};
 
@@ -349,22 +342,58 @@
     smallcaps:new Map([...a].map((c,i)=>[c,A[i]]))
   };
 
-  // Combining marks + helpers
-  const CM={ strike:'\u0336', underline:'\u0332', overline:'\u0305', slash:'\u0337', wavy:'\u0334', dot:'\u0307', ring:'\u030A' };
-  const CM_RE=/\p{Mn}+/gu;
-  const removeCombining=s=>s.normalize('NFD').replace(CM_RE,'');
-  const overlay=(s,marks)=>{const combo=marks.join('');return [...s].map(ch=> (ch===' '||ch==='\n')? ch : ch+combo).join('');}
-  const transformWithMap=(s,map)=>[...s].map(ch=> map.get(ch)||ch).join('');
-  const toTitle=s=>s.toLowerCase().replace(/\b([a-z])(\w*)/g,(_,h,rest)=>h.toUpperCase()+rest);
-  const mapRun=(s,id)=>{const m=MAPS[id]; return m? transformWithMap(s,m) : s;}
-  const sentenceStrike=s=>[...s].map(ch=> (ch===' '||ch==='\n')? ch : ch+CM.strike).join('');
-
-  // Tiny/Sub/Sup char maps
   const tinyMap=new Map(Object.entries({a:'ᵃ',b:'ᵇ',c:'ᶜ',d:'ᵈ',e:'ᵉ',f:'ᶠ',g:'ᵍ',h:'ʰ',i:'ᶦ',j:'ʲ',k:'ᵏ',l:'ˡ',m:'ᵐ',n:'ⁿ',o:'ᵒ',p:'ᵖ',q:'ᑫ',r:'ʳ',s:'ˢ',t:'ᵗ',u:'ᵘ',v:'ᵛ',w:'ʷ',x:'ˣ',y:'ʸ',z:'ᶻ',A:'ᴬ',B:'ᴮ',C:'ᶜ',D:'ᴰ',E:'ᴱ',F:'ᶠ',G:'ᴳ',H:'ᴴ',I:'ᴵ',J:'ᴶ',K:'ᴷ',L:'ᴸ',M:'ᴹ',N:'ᴺ',O:'ᴼ',P:'ᴾ',Q:'ᑫ',R:'ᴿ',S:'ˢ',T:'ᵀ',U:'ᵁ',V:'ⱽ',W:'ᵂ',X:'ˣ',Y:'ʸ',Z:'ᶻ',0:'⁰',1:'¹',2:'²',3:'³',4:'⁴',5:'⁵',6:'⁶',7:'⁷',8:'⁸',9:'⁹'}));
   const subMap=new Map(Object.entries({a:'ₐ',e:'ₑ',h:'ₕ',i:'ᵢ',j:'ⱼ',k:'ₖ',l:'ₗ',m:'ₘ',n:'ₙ',o:'ₒ',p:'ₚ',r:'ᵣ',s:'ₛ',t:'ₜ',u:'ᵤ',v:'ᵥ',x:'ₓ',0:'₀',1:'₁',2:'₂',3:'₃',4:'₄',5:'₅',6:'₆',7:'₇',8:'₈',9:'₉'}));
   const supMap=new Map(); 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-=()'.split('').forEach(ch=>{supMap.set(ch,tinyMap.get(ch)||({'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','+':'⁺','-':'⁻','=':'⁼','(':'⁽',')':'⁾'})[ch]||ch)});
 
-  // ===== Selection-aware apply helper
+  // Build reverse maps (to strip a selection back to plain before re-applying a style)
+  function buildReverseMap(srcMap){
+    const rev=new Map();
+    srcMap.forEach((v,k)=>{ rev.set(v,k); });
+    return rev;
+  }
+  const reverseMaps = {
+    ...Object.fromEntries(Object.entries(MAPS).filter(([k])=>k!=='plain').map(([k,m])=>[k, buildReverseMap(m)]))
+  };
+  const tinyRev = buildReverseMap(tinyMap);
+  const subRev  = buildReverseMap(subMap);
+  const supRev  = buildReverseMap(supMap);
+
+  // Combined “any fancy -> ASCII” reverse
+  const reverseAll = new Map();
+  // order matters; later sets can overwrite earlier (that’s fine for our use)
+  [reverseMaps.bold, reverseMaps.italic, reverseMaps.boldItalic, reverseMaps.sans, reverseMaps.sansBold, reverseMaps.mono,
+   reverseMaps.scriptBold, reverseMaps.frakturBold, reverseMaps.doublestruck, reverseMaps.fullwidth, reverseMaps.circled,
+   reverseMaps.squared, reverseMaps.smallcaps, tinyRev, subRev, supRev].forEach(r=>{
+    if(!r) return;
+    r.forEach((base,fancy)=>{ if(!reverseAll.has(fancy)) reverseAll.set(fancy, base); });
+  });
+
+  const CM={ strike:'\u0336', underline:'\u0332', overline:'\u0305', slash:'\u0337', wavy:'\u0334', dot:'\u0307', ring:'\u030A' };
+  const CM_RE=/\p{Mn}+/gu;
+  const removeCombining=s=>s.normalize('NFD').replace(CM_RE,'');
+  const removeSpecific=(s,mark)=>s.normalize('NFD').replace(new RegExp(mark,'g'),'');
+  const overlay=(s,marks)=>{const combo=marks.join('');return [...s].map(ch=> (ch===' '||ch==='\n')? ch : ch+combo).join('');}
+  const transformWithMap=(s,map)=>[...s].map(ch=> map.get(ch)||ch).join('');
+  const demapToPlain=(s)=>[...s].map(ch=> reverseAll.get(ch)||ch).join('');
+  const toTitle=s=>s.toLowerCase().replace(/\b([a-z])(\w*)/g,(_,h,rest)=>h.toUpperCase()+rest);
+  const mapRun=(s,id)=>{const m=MAPS[id]; return m? transformWithMap(s,m) : s;}
+  const sentenceStrike=s=>[...s].map(ch=> (ch===' '||ch==='\n')? ch : ch+CM.strike).join('');
+
+  // List helpers
+  const stripBullets = s => s.split(/\n/).map(line => line.replace(/^\s*(?:[•\-*]\s+)/,'')).join('\n');
+  const applyBullets = s => s.split(/\n/).map(line => line.trim()? '• ' + line.replace(/^\s*(?:[•\-*]\s+)/,'') : '').join('\n');
+  const isBulleted   = s => s.split(/\n/).some(line=>/^\s*[•\-*]\s+/.test(line));
+
+  const stripNumbers = s => s.split(/\n/).map(line => line.replace(/^\s*\d+\.\s+/,'')).join('\n');
+  const isNumbered   = s => s.split(/\n/).some(line=>/^\s*\d+\.\s+/.test(line));
+  const applyNumbers = s => { let i = 1; return s.split(/\n/).map(line => line.trim()? (i++) + '. ' + line.replace(/^\s*\d+\.\s+/,'') : '').join('\n'); };
+
+  const stripQuotes  = s => s.split(/\n/).map(l => l.replace(/^“/,'').replace(/”$/,'')).join('\n');
+  const isQuoted     = s => s.split(/\n/).some(l=>/^“.*”$/.test(l));
+  const applyQuotes  = s => s.split(/\n/).map(l => l? ('“' + stripQuotes(l) + '”') : '').join('\n');
+
+  // Selection-aware apply
   function applyToSelectionOrAll(transform){
     const el = input;
     const start = el.selectionStart ?? 0, end = el.selectionEnd ?? 0;
@@ -374,7 +403,6 @@
       const after = el.value.slice(end);
       const out = transform(sel);
       el.value = before + out + after;
-      // keep selection on transformed block
       el.selectionStart = start;
       el.selectionEnd = start + out.length;
     } else {
@@ -383,47 +411,57 @@
     updateCounts();
   }
 
-  // ===== Line-based helpers (used by both mini tools and global toggles)
-  const stripBullets = s => s.split(/\n/).map(line => line.replace(/^\s*(?:[•\-*]\s+)/,'')).join('\n');
-  const applyBullets = s => s.split(/\n/).map(line => line.trim()? '• ' + line.replace(/^\s*(?:[•\-*]\s+)/,'') : '').join('\n');
-  const stripNumbers = s => s.split(/\n/).map(line => line.replace(/^\s*\d+\.\s+/,'')).join('\n');
-  const applyNumbers = s => { let i = 1; return s.split(/\n/).map(line => line.trim()? (i++) + '. ' + line.replace(/^\s*\d+\.\s+/,'') : '').join('\n'); };
-  const stripQuotes = s => s.split(/\n/).map(l => l.replace(/^“/,'').replace(/”$/,'')).join('\n');
-  const applyQuotes = s => s.split(/\n/).map(l => l? ('“' + stripQuotes(l) + '”') : '').join('\n');
+  // === TRUE TOGGLES FOR MINI BAR ===
+  function toggleFontSel(s, fontId){
+    // Normalize selection to plain, then apply font if not already fully that font.
+    const base = demapToPlain(s);
+    const reapplied = mapRun(base, fontId);
+    return (s === reapplied) ? base : reapplied;
+  }
+  function toggleBold(s){ return toggleFontSel(s,'bold'); }
+  function toggleItalic(s){ return toggleFontSel(s,'italic'); }
+  function toggleUnderline(s){
+    return s.includes(CM.underline) ? removeSpecific(s, CM.underline) : overlay(s,[CM.underline]);
+  }
+  function toggleStrike(s){
+    return s.includes(CM.strike) ? removeSpecific(s, CM.strike) : overlay(s,[CM.strike]);
+  }
+  function toggleBullets(s){ return isBulleted(s) ? stripBullets(s) : applyBullets(s); }
+  function toggleNumbers(s){ return isNumbered(s) ? stripNumbers(s) : applyNumbers(s); }
+  function toggleQuote(s){ return isQuoted(s) ? stripQuotes(s) : applyQuotes(s); }
+  function toggleTiny(s){ const base=demapToPlain(s); const applied=transformWithMap(base,tinyMap); return (s===applied)? base: applied; }
+  function toggleSub(s){ const base=demapToPlain(s); const applied=transformWithMap(base,subMap);  return (s===applied)? base: applied; }
+  function toggleSup(s){ const base=demapToPlain(s); const applied=transformWithMap(base,supMap);  return (s===applied)? base: applied; }
+  function clearSel(s){ return removeCombining(demapToPlain(s).normalize('NFKD')); }
 
-  // ===== MINI TOOLBAR: selection-focused actions
   const miniActions = {
-    bold: s => mapRun(s,'bold'),
-    italic: s => mapRun(s,'italic'),
-    underline: s => overlay(s,[CM.underline]),
-    strike: s => overlay(s,[CM.strike]),
-    bullets: s => applyBullets(s),
-    numbers: s => applyNumbers(s),
-    quote: s => applyQuotes(s),
-    clear: s => removeCombining(s.normalize('NFKD')),
-    upper: s => s.toUpperCase(),
-    lower: s => s.toLowerCase(),
-    title: s => toTitle(s),
-    tiny: s => transformWithMap(s, tinyMap),
-    sub: s => transformWithMap(s, subMap),
-    sup: s => transformWithMap(s, supMap),
-    fontSel: (s, fontId) => fontId ? mapRun(s, fontId) : s
+    bold:     s => toggleBold(s),
+    italic:   s => toggleItalic(s),
+    underline:s => toggleUnderline(s),
+    strike:   s => toggleStrike(s),
+    bullets:  s => toggleBullets(s),
+    numbers:  s => toggleNumbers(s),
+    quote:    s => toggleQuote(s),
+    tiny:     s => toggleTiny(s),
+    sub:      s => toggleSub(s),
+    sup:      s => toggleSup(s),
+    clear:    s => clearSel(s),
+    fontSel:  (s, fontId) => toggleFontSel(s, fontId)
   };
 
-  // Wire mini buttons
+  // Mini bar wiring
   $$('.miniBtn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const act = btn.dataset.act;
       if(act in miniActions){
         applyToSelectionOrAll(miniActions[act]);
       }
-      // update preview after any inline change
       runFormatPreviewOnly();
       input.focus();
     });
   });
 
-  // Font for selection dropdown + immediate apply
+  // Font (selection) dropdown
   const FONT_OPTIONS=[
     ['bold','Bold','Bold text'],
     ['italic','Italic','Italic text'],
@@ -467,7 +505,6 @@
     return order.map(o=>o.t).join('\n');
   }
 
-  // Full reformat pipeline (used when pressing Format → Preview or toggles change with no selection)
   function runFormat(){
     let s = input.value || '';
 
@@ -489,7 +526,7 @@
     const font = (document.querySelector('input[name="font"]:checked')||{}).value;
     if(font) s = mapRun(s, font);
 
-    // Bold/Italic toggles (stackable)
+    // Bold/Italic toggles (stackable on global)
     if($('#stBold').checked)   s = mapRun(s,'bold');
     if($('#stItalic').checked) s = mapRun(s,'italic');
 
@@ -523,13 +560,12 @@
     updateCounts();
   }
 
-  // Update preview only (used by inline tools so global toggles aren’t re-applied)
   function runFormatPreviewOnly(){
     liBody.textContent = input.value || '';
     updateCounts();
   }
 
-  // Recommendations, randomize, fonts palette for the right-side “Fancy fonts” section
+  // Recommendations / Randomize (unchanged from previous good build)
   function randPick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
   function coin(p=0.5){ return Math.random()<p; }
   function looksLikeList(s){ return /^\s*[-•\d]/m.test(s) || s.split('\n').filter(x=>x.trim()).length >= 3; }
@@ -611,7 +647,7 @@
     });
   }
 
-  // Build fonts palette (visual on the Fonts section)
+  // Build fonts palette (global fonts section)
   const fontsGrid = $('#fontsGrid');
   FONT_OPTIONS.forEach(([id,label,example])=>{
     const row=document.createElement('label'); row.className='chip'; row.title=label;
@@ -646,7 +682,6 @@
   $('#clearBtn').addEventListener('click', ()=>{
     input.value='';
     liBody.textContent='';
-    // Reset toggles
     ['stBold','stItalic','stBullets','stNumbers','stQuote','upper','lower','title','tiny','sub','sup','clean','ovStrike','ovUnder','ovOver','ovSlash','ovWavy','ovDot','ovRing','sentStrike']
       .forEach(id=>{ const el = document.getElementById(id); if(el) el.checked = false; });
     document.querySelectorAll('input[name="font"]').forEach(el=> el.checked=false);
@@ -656,15 +691,11 @@
   });
   $('#copyBtn').addEventListener('click', ()=> navigator.clipboard.writeText(liBody.textContent||''));
 
-  // Toolkit picker show/hide logic
+  // Toolkit picker visibility
   const toolsets = {
     all: ['basic','lists','fonts','transform','sort','overlays'],
-    basic: ['basic'],
-    lists: ['lists'],
-    fonts: ['fonts'],
-    transform: ['transform'],
-    sort: ['sort'],
-    overlays: ['overlays']
+    basic: ['basic'], lists: ['lists'], fonts: ['fonts'],
+    transform: ['transform'], sort: ['sort'], overlays: ['overlays']
   };
   function renderToolkit(value){
     const wanted = new Set(toolsets[value] || toolsets.all);
@@ -676,7 +707,7 @@
   $('#toolkitPick').addEventListener('change', e=> renderToolkit(e.target.value));
   renderToolkit('all');
 
-  // Live reformat on toggle/radio change (GLOBAL behavior when no selection)
+  // Live global toggles/radios behavior (with selection-aware fallback)
   const liveSelectors = [
     'input[name="sort"]','input[name="font"]',
     '#stBold','#stItalic','#stBullets','#stNumbers','#stQuote',
@@ -686,54 +717,79 @@
   $$(liveSelectors.join(',')).forEach(el=> el.addEventListener('change', ()=>{
     const hasSel = (input.selectionEnd ?? 0) > (input.selectionStart ?? 0);
     if(hasSel){
-      // If user has a selection and toggles something, apply that single effect to selection,
-      // then immediately uncheck/revert the control to avoid locking it globally.
-      const id = el.id;
-      const name = el.name;
-      // Map control -> transform
+      const id = el.id, name = el.name;
       const mapControlToTransform = {
-        stBullets: s=>applyBullets(s), stNumbers: s=>applyNumbers(s), stQuote: s=>applyQuotes(s),
+        stBullets: s=>toggleBullets(s), stNumbers: s=>toggleNumbers(s), stQuote: s=>toggleQuote(s),
         upper: s=>s.toUpperCase(), lower: s=>s.toLowerCase(), title: s=>toTitle(s),
-        tiny: s=>transformWithMap(s,tinyMap), sub: s=>transformWithMap(s,subMap), sup: s=>transformWithMap(s,supMap),
-        clean: s=>removeCombining(s),
-        ovStrike: s=>overlay(s,[CM.strike]), ovUnder: s=>overlay(s,[CM.underline]),
-        ovOver: s=>overlay(s,[CM.overline]), ovSlash: s=>overlay(s,[CM.slash]),
-        ovWavy: s=>overlay(s,[CM.wavy]), ovDot: s=>overlay(s,[CM.dot]), ovRing: s=>overlay(s,[CM.ring]),
-        sentStrike: s=>sentenceStrike(s),
-        stBold: s=>mapRun(s,'bold'), stItalic: s=>mapRun(s,'italic')
+        tiny: s=>toggleTiny(s), sub: s=>toggleSub(s), sup: s=>toggleSup(s),
+        clean: s=>clearSel(s),
+        ovStrike: s=>toggleStrike(s), ovUnder: s=>toggleUnderline(s),
+        ovOver: s=> s.includes(CM.overline)? removeSpecific(s,CM.overline): overlay(s,[CM.overline]),
+        ovSlash: s=> s.includes(CM.slash)? removeSpecific(s,CM.slash): overlay(s,[CM.slash]),
+        ovWavy: s=> s.includes(CM.wavy)? removeSpecific(s,CM.wavy): overlay(s,[CM.wavy]),
+        ovDot: s=> s.includes(CM.dot)? removeSpecific(s,CM.dot): overlay(s,[CM.dot]),
+        ovRing: s=> s.includes(CM.ring)? removeSpecific(s,CM.ring): overlay(s,[CM.ring]),
+        sentStrike: s=> sentenceStrike(s),
+        stBold: s=>toggleBold(s), stItalic: s=>toggleItalic(s)
       };
-      if(name==='font'){ // radio font family to selection
+      if(name==='font'){ // font radios to selection
         const font = (document.querySelector('input[name="font"]:checked')||{}).value;
-        applyToSelectionOrAll(ss=> font ? mapRun(ss,font) : ss);
-        // clear the radio so it doesn't stick globally
+        applyToSelectionOrAll(ss=> font ? toggleFontSel(ss,font) : ss);
         document.querySelectorAll('input[name="font"]').forEach(r=> r.checked=false);
       } else if(mapControlToTransform[id]){
         applyToSelectionOrAll(mapControlToTransform[id]);
-        // revert checkbox/radio
         if(el.type==='checkbox') el.checked=false;
         if(name==='sort'){ document.querySelector('input[name="sort"][value="none"]').checked=true; }
       } else {
-        // Fallback to full run if unknown
         runFormat();
       }
       runFormatPreviewOnly();
       input.focus();
     } else {
-      // No selection: apply globally via normal pipeline
       runFormat();
     }
   }));
 
-  // ====== Schedule & Post (RIGHT column) ======
+  // ===== Keyboard Shortcuts on textarea =====
+  input.addEventListener('keydown', (e)=>{
+    const mod = e.metaKey || e.ctrlKey;
+    const shift = e.shiftKey;
+    const alt = e.altKey;
+
+    // helper that applies selection-aware
+    const doAct = (fn)=>{
+      e.preventDefault();
+      applyToSelectionOrAll(fn);
+      runFormatPreviewOnly();
+    };
+
+    if(mod && !shift && !e.altKey){
+      if(e.key.toLowerCase()==='b'){ doAct(toggleBold); return; }                 // Cmd/Ctrl+B
+      if(e.key.toLowerCase()==='i'){ doAct(toggleItalic); return; }               // Cmd/Ctrl+I
+      if(e.key.toLowerCase()==='u'){ doAct(toggleUnderline); return; }            // Cmd/Ctrl+U
+    }
+    if(alt && shift && e.key==='5'){ doAct(toggleStrike); return; }               // Alt+Shift+5
+    if(mod && shift){
+      if(e.key==='7'){ doAct(toggleNumbers); return; }                            // Cmd/Ctrl+Shift+7
+      if(e.key==='8'){ doAct(toggleBullets); return; }                            // Cmd/Ctrl+Shift+8
+      if(e.key==='9'){ doAct(toggleQuote); return; }                              // Cmd/Ctrl+Shift+9
+      if(e.key.toLowerCase()==='x'){ doAct(clearSel); return; }                   // Cmd/Ctrl+Shift+X
+    }
+  });
+
+  // Image + composer + ICS (same as before)
+  $('#imagePick').addEventListener('change', (e)=>{
+    const f = e.target.files?.[0]; if(!f) return; const url = URL.createObjectURL(f);
+    const im = $('#liImage'); im.src=url; im.style.display='block';
+  });
+
   function openLinkedInComposerWithClipboard(){
     const text = liBody.textContent || input.value || '';
     if(!text.trim()){ alert('Write or format something first.'); return; }
-
     const openComposer = ()=>{
       window.open('https://www.linkedin.com/feed/?shareActive=true','_blank','noopener');
       setTimeout(()=>alert('Your text is copied. In LinkedIn’s composer, paste (Cmd/Ctrl+V). To schedule, click the clock icon to pick date/time.'), 250);
     };
-
     navigator.clipboard.writeText(text).finally(()=>{
       if(navigator.share){
         navigator.share({ text })
@@ -744,7 +800,6 @@
       }
     });
   }
-
   function pad(n){return String(n).padStart(2,'0');}
   function toICSDate(dt){
     const y = dt.getUTCFullYear();
@@ -755,24 +810,18 @@
     const ss = pad(dt.getUTCSeconds());
     return `${y}${m}${d}T${hh}${mm}${ss}Z`;
   }
-
   function downloadICS(){
     const text = (liBody.textContent || input.value || '').trim();
     if(!text){ alert('Nothing to schedule. Add some text first.'); return; }
-
     const raw = $('#postWhen').value;
     if(!raw){ alert('Pick a date/time first.'); return; }
-
     const when = new Date(raw);
     if(isNaN(when.getTime())){ alert('Invalid date/time.'); return; }
-
     const end = new Date(when.getTime() + 30*60*1000);
-
     const uid = 'crm-hacker-' + Date.now() + '@formatter';
     const dtstamp = toICSDate(new Date());
     const dtstart = toICSDate(when);
     const dtend = toICSDate(end);
-
     const ics =
 `BEGIN:VCALENDAR
 VERSION:2.0
@@ -788,22 +837,18 @@ SUMMARY:Post on LinkedIn (CRM Hacker)
 DESCRIPTION:${text.replace(/\n/g,'\\n').replace(/,/g,'\\,')}
 END:VEVENT
 END:VCALENDAR`;
-
     const blob = new Blob([ics], {type:'text/calendar'});
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'linkedin-post.crmhacker.ics';
-    document.body.appendChild(a);
-    a.click();
+    const a = document.createElement('a'); a.href = url; a.download = 'linkedin-post.crmhacker.ics';
+    document.body.appendChild(a); a.click();
     setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
   }
-
   $('#postNowBtn').addEventListener('click', openLinkedInComposerWithClipboard);
   $('#icsBtn').addEventListener('click', downloadICS);
 
   // Init
-  updateCounts(); runFormat();
+  updateCounts(); 
+  liBody.textContent=''; // start empty
 </script>
 </body>
 </html>
