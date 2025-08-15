@@ -7,25 +7,13 @@
   <meta name="description" content="CRM Hacker LinkedIn text formatter: bold, italic, underline, strikethrough, Unicode fonts, bullets, numbers, title case, upper/lower, tiny/sub/sup, staircase sorting, live LinkedIn preview, copy to clipboard, expert FAQs.">
   <style>
     :root{
-      /* Soft CRM Hacker theme */
       --accent:#ff2c2c; --accent-2:#ff5858;
-      --bg:#f7f8fb;           /* soft off-white page background */
-      --panel:#ffffff;        /* cards */
-      --ink:#1b1f23;          /* primary text */
-      --muted:#5b6070;        /* secondary text */
-      --line:#e6e8ef;         /* borders */
-      --ok:#18c37d; --warn:#b25b00;
-      --li-blue:#0a66c2;
-      --highlight:#fff3f3;    /* subtle red-tinted highlight */
-      --highlight-border:#ffd9d9;
+      --bg:#f7f8fb; --panel:#ffffff;
+      --ink:#1b1f23; --muted:#5b6070; --line:#e6e8ef;
+      --ok:#18c37d; --warn:#b25b00; --li-blue:#0a66c2;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;background:var(--bg);color:var(--ink);
-      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
-    }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
     a{color:var(--accent)}
     .wrap{max-width:1280px;margin:28px auto;padding:0 16px}
     .topbar{display:flex;align-items:center;gap:12px;margin-bottom:14px}
@@ -40,25 +28,16 @@
     .pad{padding:14px}
     .divider{height:1px;background:var(--line);margin:12px 0}
 
-    textarea{
-      width:100%;min-height:220px;background:#fcfcfe;color:var(--ink);
-      border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:16px;outline:none;resize:vertical;
-    }
+    textarea{width:100%;min-height:220px;background:#fcfcfe;color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:16px;outline:none;resize:vertical}
     .muted{color:var(--muted);font-size:12px}
 
     /* Toolbar + buttons */
     .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .tool{
-      display:inline-flex;align-items:center;justify-content:center;gap:6px;
-      padding:9px 10px;border:1px solid var(--line);background:#fff;border-radius:10px;color:var(--ink);cursor:pointer
-    }
+    .tool{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 10px;border:1px solid var(--line);background:#fff;border-radius:10px;color:var(--ink);cursor:pointer}
     .tool svg{width:18px;height:18px}
     .tool:hover{transform:translateY(-1px);box-shadow:0 2px 8px #00000010}
     .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
-    .btn{
-      background:#fff;border:1px solid var(--line);color:var(--ink);
-      padding:10px 12px;border-radius:12px;font-weight:600;cursor:pointer
-    }
+    .btn{background:#fff;border:1px solid var(--line);color:var(--ink);padding:10px 12px;border-radius:12px;font-weight:600;cursor:pointer}
     .btn:hover{transform:translateY(-1px);box-shadow:0 2px 8px #00000010}
     .btn.primary{background:var(--accent);border-color:var(--accent-2);color:#fff}
     .btn.good{background:var(--ok);border-color:#27da97;color:#fff}
@@ -66,18 +45,19 @@
     /* Labels */
     .groupTitle{display:flex;align-items:center;gap:6px;color:#2d3340;font-size:12px;margin:8px 0}
 
-    /* Visual style palette */
+    /* Visual style palette (fancy fonts) */
     .palette{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-top:10px}
     .chip{display:flex;align-items:center;gap:8px;padding:10px;border:1px solid var(--line);background:#fff;border-radius:10px;cursor:pointer}
     .chip input{accent-color:var(--accent)}
     .sample{margin-left:auto;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
 
-    /* Top recommendation highlight (above toolbar) */
-    .topReco{display:none;margin:8px 0 12px;background:var(--highlight);border:1px solid var(--highlight-border);border-radius:12px;padding:12px 12px 10px}
-    .topRecoHeader{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-    .topRecoTitle{font-weight:800;color:#802525}
-    .topRecoBtns{margin-left:auto;display:flex;gap:8px}
-    .topRecoText{white-space:pre-wrap;word-break:break-word;background:#fff;border:1px dashed var(--line);border-radius:8px;padding:10px}
+    /* Recommendations grid (now shown directly under textarea) */
+    .recoGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin:10px 0}
+    .recoCard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px}
+    .recoHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+    .recoTitle{font-weight:700} .recoDesc{color:var(--muted);font-size:12px}
+    .recoText{white-space:pre-wrap;word-break:break-word;background:#fcfcfe;border:1px solid var(--line);border-radius:8px;padding:8px;margin:8px 0;max-height:180px;overflow:auto}
+    .recoBtns{display:flex;gap:8px}
 
     /* Preview (right) */
     .previewShell{padding:12px}
@@ -90,19 +70,8 @@
     .liImage{width:100%;display:none;max-height:380px;object-fit:cover;background:#f5f6f8}
     .liActions{display:flex;gap:18px;border-top:1px solid var(--line);padding:10px 12px;color:#5f6b7a;font-size:13px}
     .deviceRow{display:flex;align-items:center;gap:10px;margin:8px 0 0}
-    .deviceRow .chip{background:#fff}
-
-    /* Character meter */
     .meter{height:8px;background:#eef0f7;border-radius:999px;border:1px solid var(--line);overflow:hidden}
     .meter>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#ff9b73)}
-
-    /* Recommendations grid (below editor) */
-    .recoGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:8px}
-    .recoCard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px}
-    .recoHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-    .recoTitle{font-weight:700} .recoDesc{color:var(--muted);font-size:12px}
-    .recoText{white-space:pre-wrap;word-break:break-word;background:#fcfcfe;border:1px solid var(--line);border-radius:8px;padding:8px;margin:8px 0;max-height:180px;overflow:auto}
-    .recoBtns{display:flex;gap:8px}
   </style>
 </head>
 <body>
@@ -115,7 +84,7 @@
       </div>
     </div>
 
-    <!-- Hero (clean + soft) -->
+    <!-- Hero -->
     <div class="card pad" style="margin-bottom:14px">
       <p style="margin:0 0 6px;color:#2d3340">
         Format LinkedIn posts that are clean, scannable, and on-brand—without fighting the editor. Paste your text, pick a style, preview, and copy.
@@ -127,19 +96,23 @@
       <div class="card pad">
         <h3 style="margin-top:0">Editor</h3>
 
-        <!-- Top Recommendation (appears after Recommend click) -->
-        <div id="topReco" class="topReco" role="region" aria-live="polite">
-          <div class="topRecoHeader">
-            <div class="topRecoTitle" id="topRecoTitle">Recommended format</div>
-            <div class="topRecoBtns">
-              <button class="btn" id="topRecoUse">Use this</button>
-              <button class="btn" id="topRecoCopy">Copy</button>
-            </div>
-          </div>
-          <div id="topRecoText" class="topRecoText"></div>
+        <!-- Textarea -->
+        <textarea id="input" placeholder="Write or paste your post…">Busy ≠ productive. Especially in RevOps.
+Busy work. Busy work. Busy work.</textarea>
+
+        <!-- Primary controls -->
+        <div class="controls">
+          <button class="btn primary" id="formatBtn">Format → Preview</button>
+          <button class="btn" id="recommendBtn">Recommend formatting</button>
+          <span class="muted" id="counts">0 chars • 0 words</span>
         </div>
 
-        <!-- Primary toolbar -->
+        <!-- RECOMMENDATIONS now live here (beneath input, above formatting options) -->
+        <div id="recoArea"></div>
+
+        <div class="divider"></div>
+
+        <!-- Formatting options (toolbar moved below recommendations) -->
         <div class="toolbar" aria-label="toolbar" title="Apply to selection or whole text">
           <button class="tool" data-act="bold" title="Bold">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 6h6a3 3 0 110 6H7zm0 6h7a3 3 0 110 6H7"/></svg>
@@ -168,21 +141,10 @@
           </button>
         </div>
 
-        <div class="divider"></div>
-
-        <textarea id="input" placeholder="Write or paste your post…">Busy ≠ productive. Especially in RevOps.
-Busy work. Busy work. Busy work.</textarea>
-
-        <div class="controls">
-          <button class="btn primary" id="formatBtn">Format → Preview</button>
-          <button class="btn" id="recommendBtn">Recommend formatting</button>
-          <span class="muted" id="counts">0 chars • 0 words</span>
-        </div>
-
-        <!-- Visual style palette (Unicode fonts) -->
+        <!-- Fancy fonts palette -->
         <div class="palette" id="fontsGrid"></div>
 
-        <!-- Case + size + mark cleanup -->
+        <!-- Case + size + cleanup -->
         <div class="groupTitle">Text transforms</div>
         <div class="toolbar">
           <label class="chip"><input type="checkbox" id="upper"> UPPER</label>
@@ -217,9 +179,6 @@ Busy work. Busy work. Busy work.</textarea>
           <label class="chip"><input type="checkbox" id="sentStrike"> Strike per sentence</label>
         </div>
 
-        <!-- Where the full recommendations list renders -->
-        <div id="recoArea" style="margin-top:8px"></div>
-
         <div class="divider"></div>
         <div class="muted">© CRM Hacker</div>
       </div>
@@ -239,7 +198,6 @@ Busy work. Busy work. Busy work.</textarea>
 
         <div id="preview" class="preview" style="margin-top:12px;max-width:760px">
           <div class="liTop">
-            <!-- CRM Hacker logo as avatar -->
             <img src="logo.png" alt="CRM Hacker avatar">
             <div>
               <div class="liName">CRM Hacker</div>
@@ -306,9 +264,6 @@ Busy work. Busy work. Busy work.</textarea>
   // Elements
   const input = $('#input'), liBody = $('#liBody');
   const meterBar = $('#meterBar'), limitInfo = $('#limitInfo');
-  const topReco = $('#topReco'), topRecoText = $('#topRecoText'), topRecoTitle = $('#topRecoTitle');
-  const topRecoUse = $('#topRecoUse'), topRecoCopy = $('#topRecoCopy');
-
   const LINKEDIN_LIMIT = 3000;
 
   function updateCounts(){
@@ -352,14 +307,12 @@ Busy work. Busy work. Busy work.</textarea>
   const transformWithMap=(s,map)=>[...s].map(ch=> map.get(ch)||ch).join('');
   const toTitle=s=>s.toLowerCase().replace(/\b([a-z])(\w*)/g,(_,h,rest)=>h.toUpperCase()+rest);
   const mapRun=(s,id)=>{const m=MAPS[id]; return m? transformWithMap(s,m) : s;}
+  const sentenceStrike=s=>[...s].map(ch=> (ch===' '||ch==='\n')? ch : ch+CM.strike).join('');
 
   // Tiny/Sub/Sup maps
   const tinyMap=new Map(Object.entries({a:'ᵃ',b:'ᵇ',c:'ᶜ',d:'ᵈ',e:'ᵉ',f:'ᶠ',g:'ᵍ',h:'ʰ',i:'ᶦ',j:'ʲ',k:'ᵏ',l:'ˡ',m:'ᵐ',n:'ⁿ',o:'ᵒ',p:'ᵖ',q:'ᑫ',r:'ʳ',s:'ˢ',t:'ᵗ',u:'ᵘ',v:'ᵛ',w:'ʷ',x:'ˣ',y:'ʸ',z:'ᶻ',A:'ᴬ',B:'ᴮ',C:'ᶜ',D:'ᴰ',E:'ᴱ',F:'ᶠ',G:'ᴳ',H:'ᴴ',I:'ᴵ',J:'ᴶ',K:'ᴷ',L:'ᴸ',M:'ᴹ',N:'ᴺ',O:'ᴼ',P:'ᴾ',Q:'ᑫ',R:'ᴿ',S:'ˢ',T:'ᵀ',U:'ᵁ',V:'ⱽ',W:'ᵂ',X:'ˣ',Y:'ʸ',Z:'ᶻ',0:'⁰',1:'¹',2:'²',3:'³',4:'⁴',5:'⁵',6:'⁶',7:'⁷',8:'⁸',9:'⁹'}));
   const subMap=new Map(Object.entries({a:'ₐ',e:'ₑ',h:'ₕ',i:'ᵢ',j:'ⱼ',k:'ₖ',l:'ₗ',m:'ₘ',n:'ₙ',o:'ₒ',p:'ₚ',r:'ᵣ',s:'ₛ',t:'ₜ',u:'ᵤ',v:'ᵥ',x:'ₓ',0:'₀',1:'₁',2:'₂',3:'₃',4:'₄',5:'₅',6:'₆',7:'₇',8:'₈',9:'₉'}));
   const supMap=new Map(); 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-=()'.split('').forEach(ch=>{supMap.set(ch,tinyMap.get(ch)||({'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','+':'⁺','-':'⁻','=':'⁼','(':'⁽',')':'⁾'})[ch]||ch)});
-
-  function transformWithCharMap(s,map){return [...s].map(ch=> map.get(ch)||ch).join('');}
-  function sentenceStrike(s){ return [...s].map(ch=> (ch===' '||ch==='\n')? ch : ch+CM.strike).join(''); }
 
   // Palette (visual font chips with sample)
   const FONT_OPTIONS=[
@@ -411,6 +364,13 @@ Busy work. Busy work. Busy work.</textarea>
   // Sort / staircase
   function sortLines(text,mode){
     if(mode==='none') return text;
+    const lines = text split? text.split(/\n/):[]; // safeguard
+  }
+</script>
+<script>
+  // Fix split line (keep logic clean)
+  function sortLines(text,mode){
+    if(mode==='none') return text;
     const lines = text.split(/\n/);
     const items = lines.map((t,i)=>({t,i,len:[...t].length})).sort((a,b)=> a.len-b.len);
     let order=[]; if(mode==='asc') order=items; else if(mode==='desc') order=items.slice().reverse();
@@ -422,49 +382,47 @@ Busy work. Busy work. Busy work.</textarea>
   function runFormat(){
     let s = input.value || '';
 
-    // Case transforms (mutually exclusive priority)
+    // Case transforms (mutually exclusive)
     if($('#upper').checked) s = s.toUpperCase();
     else if($('#lower').checked) s = s.toLowerCase();
     else if($('#title').checked) s = toTitle(s);
 
     // Sorting
-    const sortMode = ($('input[name="sort"]:checked')||{}).value || 'none';
+    const sortMode = (document.querySelector('input[name="sort"]:checked')||{}).value || 'none';
     s = sortLines(s, sortMode);
 
     // Font map (Unicode)
-    const font = ($('input[name="font"]:checked')||{}).value;
+    const font = (document.querySelector('input[name="font"]:checked')||{}).value;
     if(font) s = mapRun(s, font);
 
-    // Tiny/Sub/Sup (apply only one to avoid double-mapping)
-    if($('#tiny').checked) s = transformWithCharMap(s, tinyMap);
-    else if($('#sub').checked) s = transformWithCharMap(s, subMap);
-    else if($('#sup').checked) s = transformWithCharMap(s, supMap);
+    // Tiny/Sub/Sup (apply only one)
+    if($('#tiny').checked) s = transformWithMapChars(s, tinyMap);
+    else if($('#sub').checked) s = transformWithMapChars(s, subMap);
+    else if($('#sup').checked) s = transformWithMapChars(s, supMap);
 
     // Overlays
     const marks=[]; if($('#ovStrike').checked) marks.push(CM.strike); if($('#ovUnder').checked) marks.push(CM.underline); if($('#ovOver').checked) marks.push(CM.overline); if($('#ovSlash').checked) marks.push(CM.slash); if($('#ovWavy').checked) marks.push(CM.wavy); if($('#ovDot').checked) marks.push(CM.dot); if($('#ovRing').checked) marks.push(CM.ring);
 
-    // Sentence strike is independent: always apply if toggled
-    let didSentenceStrike = false;
-    if($('#sentStrike').checked){ s = sentenceStrike(s); didSentenceStrike = true; }
+    // Sentence strike independent
+    let didSentenceStrike=false;
+    if($('#sentStrike').checked){ s = sentenceStrike(s); didSentenceStrike=true; }
 
-    // If we already did sentence strike, avoid overlaying a second strike; apply remaining marks
     const restMarks = didSentenceStrike ? marks.filter(m=>m!==CM.strike) : marks;
     if(restMarks.length) s = overlay(s, restMarks);
 
-    // Clean (remove combining marks) then re-apply overlays if any
     if($('#clean').checked){
       s = removeCombining(s);
-      if(didSentenceStrike || restMarks.length){
-        const restore = (didSentenceStrike? [CM.strike] : []).concat(restMarks);
-        if(restore.length) s = overlay(s, restore);
-      }
+      const restore = (didSentenceStrike? [CM.strike]:[]).concat(restMarks);
+      if(restore.length) s = overlay(s, restore);
     }
 
     liBody.textContent = s;
     updateCounts();
   }
 
-  // Recommendations
+  function transformWithMapChars(s,map){return [...s].map(ch=> map.get(ch)||ch).join('');}
+
+  // Recommendations (multi-option grid)
   function looksLikeList(s){ return /^\s*[-•\d]/m.test(s) || s.split('\n').filter(x=>x.trim()).length >= 3; }
   function toBullets(s){ return s.split(/\n/).map(l=> l.trim()? '• '+l.replace(/^([•\-\*\d\.]+\s*)/,'') : '').join('\n'); }
   function recommendVariants(src){
@@ -482,37 +440,33 @@ Busy work. Busy work. Busy work.</textarea>
     return variants;
   }
 
-  function renderTopRecommendation(item){
-    if(!item){ topReco.style.display='none'; return; }
-    topRecoTitle.textContent = `Recommended format — ${item.label}`;
-    topRecoText.textContent = item.text;
-    topReco.style.display = 'block';
-    topRecoUse.onclick = ()=>{ liBody.textContent = item.text; window.scrollTo({top:0,behavior:'smooth'}); };
-    topRecoCopy.onclick = async ()=>{ await navigator.clipboard.writeText(item.text); topRecoCopy.textContent='Copied!'; setTimeout(()=> topRecoCopy.textContent='Copy', 900); };
-  }
-
   function renderRecommendations(list){
-    const host = $('#recoArea'); if (!list || !list.length){ host.innerHTML = ''; topReco.style.display='none'; return; }
-    renderTopRecommendation(list[0]);
-    const rest = list.slice(1);
-    host.innerHTML = rest.length ? (`<div class="recoGrid">
-      ${rest.map((v,i)=>`
+    const host = $('#recoArea'); if (!list || !list.length){ host.innerHTML = ''; return; }
+    host.innerHTML = `<div class="recoGrid">
+      ${list.map((v,i)=>`
         <div class="recoCard">
           <div class="recoHead"><div class="recoTitle">${v.label}</div></div>
           <div class="recoDesc">${v.desc}</div>
-          <div class="recoText">${v.text}</div>
+          <div class="recoText" id="recoText_${i}">${v.text}</div>
           <div class="recoBtns">
             <button class="btn" data-use="${i}">Use this</button>
             <button class="btn" data-copy="${i}">Copy</button>
           </div>
         </div>`).join('')}
-    </div>`) : '<div class="muted">No more suggestions.</div>';
-
-    host.querySelectorAll('[data-use]').forEach((btn,idx)=>{
-      btn.addEventListener('click', ()=>{ const v = rest[idx]; liBody.textContent = v.text; });
+    </div>`;
+    host.querySelectorAll('[data-use]').forEach(btn=>{
+      btn.addEventListener('click', e=>{
+        const idx = +e.currentTarget.dataset.use;
+        liBody.textContent = list[idx].text;
+      });
     });
-    host.querySelectorAll('[data-copy]').forEach((btn,idx)=>{
-      btn.addEventListener('click', async ()=>{ const v = rest[idx]; await navigator.clipboard.writeText(v.text); btn.textContent='Copied!'; setTimeout(()=> btn.textContent='Copy', 900); });
+    host.querySelectorAll('[data-copy]').forEach(btn=>{
+      btn.addEventListener('click', async e=>{
+        const idx = +e.currentTarget.dataset.copy;
+        await navigator.clipboard.writeText(list[idx].text);
+        btn.textContent = 'Copied!';
+        setTimeout(()=> btn.textContent='Copy', 900);
+      });
     });
   }
 
@@ -528,13 +482,13 @@ Busy work. Busy work. Busy work.</textarea>
   // Wire buttons
   $('#formatBtn').addEventListener('click', runFormat);
   $('#recommendBtn').addEventListener('click', ()=>{
-    const recos = recommendVariants(input.value||'');
-    renderRecommendations(recos);
-    document.querySelector('.toolbar').scrollIntoView({behavior:'smooth', block:'start'});
+    renderRecommendations(recommendVariants(input.value||''));
+    // keep user near textarea area where recos appear
+    input.scrollIntoView({behavior:'smooth', block:'center'});
   });
   $('#copyBtn').addEventListener('click', ()=> navigator.clipboard.writeText(liBody.textContent||''));
 
-  // Optional: live reformat when toggles change
+  // Live reformat on toggle change
   const liveSelectors = [
     'input[name="sort"]','input[name="font"]',
     '#upper','#lower','#title','#tiny','#sub','#sup','#clean',
