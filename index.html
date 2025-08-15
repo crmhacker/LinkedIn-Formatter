@@ -1,0 +1,407 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LinkedIn Formatter – Unicode Styler</title>
+  <meta name="description" content="One‑click LinkedIn‑safe text formatter: bold, italic, cursive, strikethrough, underline, overline, fullwidth, monospace, circled, and more using Unicode. No markdown. No HTML.">
+  <style>
+    :root{
+      --bg:#0b0c10; --panel:#121318; --muted:#9aa0aa; --ink:#e8e8ea; --line:#24283b; --accent:#7c5cff; --accent-2:#18c37d; --danger:#ff4d5a;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:linear-gradient(180deg,#0a0b10,#0e1016);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;}
+    .wrap{max-width:1100px;margin:36px auto;padding:0 16px}
+    h1{margin:0 0 6px;font-size:28px}
+    .sub{margin:0 0 18px;color:var(--muted)}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);padding:16px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media (max-width:960px){.grid{grid-template-columns:1fr}}
+    label.sm{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
+    textarea{width:100%;min-height:160px;background:#0b0d14;color:var(--ink);border:1px solid #25283a;border-radius:12px;padding:14px 16px;font-size:16px;outline:none;resize:vertical}
+    .out{white-space:pre-wrap;word-break:break-word;min-height:160px;background:#0b0d14;border:1px dashed #2a2f47;border-radius:12px;padding:14px 16px}
+    .row{display:flex;gap:8px;flex-wrap:wrap}
+    button{background:#171a27;border:1px solid #2a2f47;color:var(--ink);padding:10px 12px;border-radius:12px;font-weight:600;cursor:pointer;transition:.15s transform,.15s background,.15s border}
+    button:hover{transform:translateY(-1px);background:#1b1f31;border-color:#3b4262}
+    button.primary{background:var(--accent);border-color:#8a75ff}
+    button.primary:hover{background:#6e52ff}
+    button.good{background:var(--accent-2);border-color:#28d694}
+    button.bad{background:var(--danger);border-color:#ff6d77}
+    .toolbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:10px}
+    .section{margin-top:14px;border-top:1px solid var(--line);padding-top:14px}
+    .flex{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .chip{display:inline-flex;align-items:center;gap:8px;background:#0f1320;border:1px solid #293257;padding:8px 10px;border-radius:12px}
+    .chip input{margin:0}
+    .aside{font-size:12px;color:var(--muted)}
+    .footer{margin:18px 0 6px;color:var(--muted);font-size:12px}
+    .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#0a0e1a;border:1px solid #26304b;border-radius:6px;padding:2px 6px;margin:0 2px}
+    .pill{display:inline-block;background:#0a0e1a;border:1px solid #2a2f47;border-radius:999px;padding:6px 10px;font-size:12px;color:#c7d2fe}
+    .cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:760px){.cols{grid-template-columns:1fr}}
+    .kbdrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+    .kbdcopy{padding:6px 8px}
+    .hint{color:#c7d2fe}
+    .stat{font-size:12px;color:var(--muted)}
+    .right{margin-left:auto}
+    .titlebar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="titlebar">
+      <h1>LinkedIn Formatter – Unicode Styler</h1>
+      <span class="pill">LinkedIn‑safe (Unicode only)</span>
+      <span class="right stat" id="stat"></span>
+    </div>
+    <p class="sub">Paste text → pick a base <strong>style</strong> → layer <strong>overlays</strong> (strikethrough/underline/overline) → copy. No HTML/Markdown — just Unicode that LinkedIn renders.</p>
+
+    <div class="grid">
+      <div class="card">
+        <label class="sm" for="input">INPUT</label>
+        <textarea id="input" placeholder="Type or paste…">Busy ≠ productive. Especially in RevOps.
+Busy work. Busy work. Busy work.</textarea>
+
+        <div class="row" style="margin-top:10px">
+          <button class="primary" id="copyOut">Copy Output</button>
+          <button id="swap">Swap ↔️</button>
+          <button class="bad" id="clearAll">Clear</button>
+        </div>
+
+        <div class="section">
+          <div class="cols">
+            <div>
+              <label class="sm">Base Style</label>
+              <div class="toolbar" id="baseStyles"></div>
+            </div>
+            <div>
+              <label class="sm">Overlays (can combine)</label>
+              <div class="toolbar" id="overlays"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="cols">
+            <div>
+              <label class="sm">Case & Transforms</label>
+              <div class="toolbar" id="transforms"></div>
+            </div>
+            <div>
+              <label class="sm">Strikethrough Options</label>
+              <div class="flex">
+                <label class="chip"><input type="checkbox" id="strikeSentence"> Strike per sentence (stop at . ! ?)</label>
+                <label class="chip"><input type="checkbox" id="stripMarks"> Auto‑clean duplicated marks</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <label class="sm">Special Characters & Dividers (click to copy)</label>
+          <div class="kbdrow" id="chars"></div>
+        </div>
+
+        <p class="aside section">Notes: LinkedIn ignores HTML/CSS and Markdown. Font size can’t be changed, but styles like <em>fullwidth</em>, <em>superscript/subscript</em>, and <em>small caps</em> can mimic visual variety. Some scripts (Fraktur/Script) use non‑ASCII Unicode — they’re visible but not searchable like plain text.</p>
+      </div>
+
+      <div class="card">
+        <label class="sm">OUTPUT</label>
+        <div id="output" class="out" aria-live="polite"></div>
+        <div class="section">
+          <div class="row">
+            <button class="good" id="copyOut2">Copy Output</button>
+            <button id="resetAll">Reset All</button>
+            <span class="aside">Tip: Toggle overlays after choosing a base style.</span>
+          </div>
+        </div>
+
+        <div class="section">
+          <label class="sm">Share this exact setup</label>
+          <div class="row">
+            <button id="copyLink">Copy Shareable Link</button>
+            <span class="aside">Encodes text + style in the URL hash.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="footer">Built for Jonathan, your royal highness 👑 • If something looks odd on LinkedIn, click <span class="kbd">Remove Marks</span> or try a different base style.</p>
+  </div>
+
+<script>
+  // ------------- Utilities
+  const $ = (sel, ctx=document) => ctx.querySelector(sel);
+  const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
+  const input = $('#input');
+  const output = $('#output');
+  const stat = $('#stat');
+
+  function copy(text){
+    navigator.clipboard.writeText(text);
+  }
+
+  function encodeState(){
+    const state = {
+      t: input.value,
+      b: currentBase,
+      o: Object.entries(currentOverlays).filter(([,v])=>v).map(([k])=>k),
+      tr: currentTransform
+    };
+    location.hash = encodeURIComponent(JSON.stringify(state));
+  }
+  function decodeState(){
+    try{
+      if(location.hash.length>1){
+        const s = JSON.parse(decodeURIComponent(location.hash.slice(1)));
+        if(s.t!=null) input.value = s.t;
+        if(s.b && BASE_STYLES[s.b]) currentBase = s.b;
+        if(Array.isArray(s.o)) s.o.forEach(k=> currentOverlays[k]=true);
+        if(s.tr && TRANSFORMS[s.tr]) currentTransform = s.tr;
+      }
+    }catch(e){ /* ignore */ }
+  }
+
+  // ------------- Character Maps (Unicode Mathematical Alphanumerics & friends)
+  const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const a = 'abcdefghijklmnopqrstuvwxyz';
+  const D = '0123456789';
+
+  function buildMap(upperStart, lowerStart, digitStart){
+    const m = new Map();
+    if(upperStart!=null){ for(let i=0;i<26;i++) m.set(A[i], String.fromCodePoint(upperStart+i)); }
+    if(lowerStart!=null){ for(let i=0;i<26;i++) m.set(a[i], String.fromCodePoint(lowerStart+i)); }
+    if(digitStart!=null){ for(let i=0;i<10;i++) m.set(D[i], String.fromCodePoint(digitStart+i)); }
+    return m;
+  }
+
+  // Base styles (safe contiguous ranges where possible)
+  const BASE_STYLES = {
+    plain: { label:'Plain', map:new Map() },
+    bold: { label:'Bold', map:buildMap(0x1D400,0x1D41A,0x1D7CE) },
+    italic: { label:'Italic', map:buildMap(0x1D434,0x1D44E,null) },
+    boldItalic: { label:'Bold Italic', map:buildMap(0x1D468,0x1D482,null) },
+    sans: { label:'Sans', map:buildMap(0x1D5A0,0x1D5BA,0x1D7E2) },
+    sansBold: { label:'Sans Bold', map:buildMap(0x1D5D4,0x1D5EE,0x1D7EC) },
+    sansItalic: { label:'Sans Italic', map:buildMap(0x1D608,0x1D622,null) },
+    sansBoldItalic: { label:'Sans Bold Italic', map:buildMap(0x1D63C,0x1D656,null) },
+    mono: { label:'Monospace', map:buildMap(0x1D670,0x1D68A,0x1D7F6) },
+    scriptBold: { label:'Cursive (Script Bold)', map:buildMap(0x1D4D0,0x1D4EA,null) },
+    frakturBold: { label:'Fraktur (Bold)', map:buildMap(0x1D56C,0x1D586,null) },
+    doublestruck: { label:'Double‑Struck', map:buildMap(0x1D538,0x1D552,0x1D7D8) },
+    fullwidth: { label:'Fullwidth', map:buildMap(0xFF21,0xFF41,0xFF10) },
+    smallcaps: { label:'Small Caps', map:new Map([...a].map((c,i)=>[c, A[i]])) },
+  };
+
+  // Overlays (combining marks)
+  const OVERLAYS = {
+    strike: { label:'Strikethrough', mark:'\u0336' },
+    strike2: { label:'Double Strike', mark:'\u0336\u0336' },
+    underline: { label:'Underline', mark:'\u0332' },
+    overline: { label:'Overline', mark:'\u0305' },
+    slash: { label:'Slash Overlay', mark:'\u0337' },
+    tilde: { label:'Wavy Overlay', mark:'\u0334' },
+    dot: { label:'Dot Above', mark:'\u0307' },
+    ring: { label:'Ring Above', mark:'\u030A' },
+  };
+
+  // Transforms
+  const TRANSFORMS = {
+    none:{label:'None', fn:s=>s},
+    upper:{label:'UPPERCASE', fn:s=>s.toUpperCase()},
+    lower:{label:'lowercase', fn:s=>s.toLowerCase()},
+    title:{label:'Title Case', fn:toTitle},
+    tiny:{label:'Tiny (superscript‑ish)', fn:toTiny},
+    sub:{label:'Subscript', fn:toSubscript},
+    sup:{label:'Superscript', fn:toSuperscript},
+    reverse:{label:'Reverse ↩︎', fn:s=>[...s].reverse().join('')},
+    upside:{label:'Upside‑Down', fn:toUpside},
+    clean:{label:'Remove Marks', fn:removeCombining}
+  };
+
+  // Special characters & dividers
+  const SPECIALS = [
+    '•','‧','·','⋅','—','–','— • —','✦','✧','✪','✺','★','☆','✩','✮','✯','⬤','○','◎','◇','◆','⬥','⬦','→','↳','➜','➤','➡︎','⟶','⇢','⇨','⟹','⇥','↗','↘','↑','↓','《》','「」','【】','〔〕','⟦⟧','⟪⟫','╭─','─╮','╰─','─╯','≈','≠','≥','≤','✓','✔︎','✗','✘','□','■','▪','▫','▸','▹','▻','◅','◂','▯','▮','▰','▱','▔','▁','▂','▃','▄','▅','▆','▇','█','░','▒','▓','▔▔▔','───','━━━'
+  ];
+
+  // ------------- Transform helpers
+  function toTitle(s){
+    return s.toLowerCase().replace(/\b([a-z])(\w*)/g, (_,h,rest)=> h.toUpperCase()+rest);
+  }
+
+  const TINY_MAP = new Map(Object.entries({
+    a:'ᵃ', b:'ᵇ', c:'ᶜ', d:'ᵈ', e:'ᵉ', f:'ᶠ', g:'ᵍ', h:'ʰ', i:'ᶦ', j:'ʲ', k:'ᵏ', l:'ˡ', m:'ᵐ', n:'ⁿ', o:'ᵒ', p:'ᵖ', q:'ᑫ', r:'ʳ', s:'ˢ', t:'ᵗ', u:'ᵘ', v:'ᵛ', w:'ʷ', x:'ˣ', y:'ʸ', z:'ᶻ',
+    A:'ᴬ', B:'ᴮ', C:'ᶜ', D:'ᴰ', E:'ᴱ', F:'ᶠ', G:'ᴳ', H:'ᴴ', I:'ᴵ', J:'ᴶ', K:'ᴷ', L:'ᴸ', M:'ᴹ', N:'ᴺ', O:'ᴼ', P:'ᴾ', Q:'ᑫ', R:'ᴿ', S:'ˢ', T:'ᵀ', U:'ᵁ', V:'ⱽ', W:'ᵂ', X:'ˣ', Y:'ʸ', Z:'ᶻ',
+    0:'⁰',1:'¹',2:'²',3:'³',4:'⁴',5:'⁵',6:'⁶',7:'⁷',8:'⁸',9:'⁹'
+  }));
+  function toTiny(s){ return [...s].map(ch=> TINY_MAP.get(ch) || ch).join(''); }
+
+  const SUB_MAP = new Map(Object.entries({
+    a:'ₐ', e:'ₑ', h:'ₕ', i:'ᵢ', j:'ⱼ', k:'ₖ', l:'ₗ', m:'ₘ', n:'ₙ', o:'ₒ', p:'ₚ', r:'ᵣ', s:'ₛ', t:'ₜ', u:'ᵤ', v:'ᵥ', x:'ₓ',
+    0:'₀',1:'₁',2:'₂',3:'₃',4:'₄',5:'₅',6:'₆',7:'₇',8:'₈',9:'₉'
+  }));
+  function toSubscript(s){ return [...s].map(ch=> SUB_MAP.get(ch) || ch).join(''); }
+
+  const SUP_MAP = new Map(Object.entries({
+    '+':'⁺','-':'⁻','=':'⁼','(':'⁽',')':'⁾',
+    0:'⁰',1:'¹',2:'²',3:'³',4:'⁴',5:'⁵',6:'⁶',7:'⁷',8:'⁸',9:'⁹'
+  }));
+  // merge tiny letters for superscript letters
+  'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(ch=>{ SUP_MAP.set(ch, TINY_MAP.get(ch) || ch); });
+  function toSuperscript(s){ return [...s].map(ch=> SUP_MAP.get(ch) || ch).join(''); }
+
+  // Upside‑down mapping (approx)
+  const UPSIDE = new Map(Object.entries({
+    a:'ɐ', b:'q', c:'ɔ', d:'p', e:'ǝ', f:'ɟ', g:'ƃ', h:'ɥ', i:'ᴉ', j:'ɾ', k:'ʞ', l:'ʃ', m:'ɯ', n:'u', o:'o', p:'d', q:'b', r:'ɹ', s:'s', t:'ʇ', u:'n', v:'ʌ', w:'ʍ', x:'x', y:'ʎ', z:'z',
+    A:'∀', B:'𐐒', C:'Ͻ', D:'◖', E:'Ǝ', F:'Ⅎ', G:'פ', H:'H', I:'I', J:'ſ', K:'ʞ', L:'˥', M:'W', N:'N', O:'O', P:'Ԁ', Q:'Ό', R:'ᴚ', S:'S', T:'┴', U:'∩', V:'Λ', W:'M', X:'X', Y:'⅄', Z:'Z',
+    0:'0',1:'Ɩ',2:'ᄅ',3:'Ɛ',4:'ㄣ',5:'ϛ',6:'9',7:'ㄥ',8:'8',9:'6', '.':'˙', ',':'\'', "':'‚', "\"":'„', '?':'¿', '!':'¡', '[':']', ']':'[', '(' :')', ')':'(', '{':'}', '}':'{', '<':'>', '>':'<'
+  }));
+  function toUpside(s){ return [...s].map(ch=> UPSIDE.get(ch) || ch).reverse().join(''); }
+
+  // Combining marks utils
+  const CM_RE = /\p{Mn}+/gu; // any combining marks
+  function removeCombining(s){ return s.normalize('NFD').replace(CM_RE,''); }
+  function applyOverlay(s, marks){
+    if(!marks.length) return s;
+    const combo = marks.join('');
+    return [...s].map(ch=> ch===' ' ? ' ' : ch + combo).join('');
+  }
+
+  // Sentence‑aware strike: apply overlay until ., !, ? then reset
+  function strikePerSentence(s, mark){
+    let out = '';
+    for(const ch of [...s]){
+      out += (ch===' '|| ch==='\n') ? ch : ch + mark;
+      if(/[.!?]/.test(ch)) out += ''; // next char continues as normal (overlay still applied per char)
+    }
+    return out;
+  }
+
+  // ------------- Render buttons
+  const baseStylesEl = $('#baseStyles');
+  const overlaysEl = $('#overlays');
+  const transformsEl = $('#transforms');
+  const charsEl = $('#chars');
+
+  let currentBase = 'plain';
+  let currentOverlays = {}; // key->bool
+  let currentTransform = 'none';
+
+  function btn(label, key, group){
+    const b = document.createElement('button');
+    b.textContent = label;
+    b.dataset.key = key;
+    b.dataset.group = group;
+    return b;
+  }
+
+  // Base styles
+  Object.entries(BASE_STYLES).forEach(([k,v])=>{
+    const b = btn(v.label, k, 'base');
+    if(k==='plain') b.classList.add('primary');
+    baseStylesEl.appendChild(b);
+  });
+
+  // Overlays
+  Object.entries(OVERLAYS).forEach(([k,v])=>{
+    const b = btn(v.label, k, 'overlay');
+    overlaysEl.appendChild(b);
+  });
+
+  // Transforms
+  Object.entries(TRANSFORMS).forEach(([k,v])=>{
+    const b = btn(v.label, k, 'transform');
+    transformsEl.appendChild(b);
+  });
+
+  // Specials
+  SPECIALS.forEach(ch=>{
+    const b = document.createElement('button');
+    b.className = 'kbdcopy';
+    b.textContent = ch;
+    b.addEventListener('click', ()=> copy(ch));
+    charsEl.appendChild(b);
+  });
+
+  // ------------- Event handling
+  document.addEventListener('click', (e)=>{
+    const t = e.target.closest('button');
+    if(!t) return;
+    const g = t.dataset.group;
+    const k = t.dataset.key;
+    if(g==='base'){
+      currentBase = k; $$("button[data-group='base']").forEach(b=>b.classList.remove('primary')); t.classList.add('primary');
+    } else if(g==='overlay'){
+      currentOverlays[k] = !currentOverlays[k]; t.classList.toggle('primary', !!currentOverlays[k]);
+    } else if(g==='transform'){
+      currentTransform = k; $$("button[data-group='transform']").forEach(b=>b.classList.remove('primary')); t.classList.add('primary');
+    }
+    render(); encodeState();
+  });
+
+  $('#clearAll').addEventListener('click', ()=>{ input.value=''; render(); encodeState(); });
+  $('#resetAll').addEventListener('click', ()=>{ currentBase='plain'; currentOverlays={}; currentTransform='none';
+    $$("button[data-group='base']").forEach(b=>b.classList.remove('primary')); $$("button[data-group='base'][data-key='plain']")[0].classList.add('primary');
+    $$("button[data-group='overlay']").forEach(b=>b.classList.remove('primary'));
+    $$("button[data-group='transform']").forEach(b=>b.classList.remove('primary')); $$("button[data-group='transform'][data-key='none']")[0].classList.add('primary');
+    $('#strikeSentence').checked=false; $('#stripMarks').checked=false; render(); encodeState();
+  });
+  $('#swap').addEventListener('click', ()=>{ const t = output.textContent; output.textContent = input.value; input.value = t; render(); encodeState(); });
+  $('#copyOut').addEventListener('click', ()=> copy(output.textContent));
+  $('#copyOut2').addEventListener('click', ()=> copy(output.textContent));
+  $('#copyLink').addEventListener('click', ()=>{ encodeState(); copy(location.href); });
+  input.addEventListener('input', ()=>{ render(); encodeState(); });
+  $('#strikeSentence').addEventListener('change', ()=> render());
+  $('#stripMarks').addEventListener('change', ()=> render());
+
+  // ------------- Render pipeline
+  function transformWithMap(s, map){
+    if(!map || map.size===0) return s;
+    return [...s].map(ch=> map.get(ch) || ch).join('');
+  }
+
+  function overlayMarksArray(){
+    const arr = [];
+    for(const k of Object.keys(currentOverlays)) if(currentOverlays[k]){
+      const mk = OVERLAYS[k].mark;
+      arr.push(...[...mk]);
+    }
+    return arr;
+  }
+
+  function render(){
+    let s = input.value || '';
+
+    // Transform step (case etc.)
+    s = TRANSFORMS[currentTransform]?.fn(s) ?? s;
+
+    // Base style mapping
+    s = transformWithMap(s, BASE_STYLES[currentBase]?.map);
+
+    // Overlays
+    const marks = overlayMarksArray();
+
+    if($('#strikeSentence').checked && currentOverlays.strike){
+      // Apply sentence‑scoped strike first, then add other overlays
+      s = strikePerSentence(s, OVERLAYS.strike.mark);
+      const other = marks.filter(m=> m!==OVERLAYS.strike.mark && m!==OVERLAYS.strike2?.mark);
+      if(other.length) s = applyOverlay(s, other);
+    } else if(marks.length){
+      s = applyOverlay(s, marks);
+    }
+
+    if($('#stripMarks').checked){ s = removeCombining(s); if(marks.length){ s = applyOverlay(s, marks); } }
+
+    output.textContent = s;
+
+    // Stats
+    stat.textContent = `Input ${input.value.length} chars • Output ${s.length} chars`;
+  }
+
+  // Init from URL if present
+  decodeState();
+  render();
+</script>
+</body>
+</html>
