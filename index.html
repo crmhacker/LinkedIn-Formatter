@@ -93,7 +93,7 @@
     .liTop img{height:40px;width:40px;border-radius:50%;background:#fff}
     .liName{font-weight:600}
     .liMeta{font-size:12px;color:#666}
-    .liFollow{margin-left:auto;background:#0a66c2;color:#fff;border:0;border-radius:999px;padding:6px 10px;font-weight:600}
+    .liFollow{margin-left:auto;background:#0a66c2;color:#fff;border:0;border-radius:999px;padding:6px 10px;font-weight:600;cursor:pointer}
     .liBody{padding:0 12px 12px;white-space:pre-wrap;word-break:break-word}
     .liImage{width:100%;display:none;max-height:380px;object-fit:cover;background:#f5f6f8}
     .liActions{display:flex;gap:18px;border-top:1px solid #eef1f5;padding:10px 12px;color:#5f6b7a;font-size:13px}
@@ -286,7 +286,7 @@
               <div class="liName">CRM Hacker</div>
               <div class="liMeta">Company • Just now • <span style="color:var(--li-blue)">#CRM #RevOps</span></div>
             </div>
-            <button class="liFollow">Follow</button>
+            <button class="liFollow" id="followBtn" aria-label="Follow CRM Hacker on LinkedIn" title="Follow on LinkedIn">Follow</button>
           </div>
           <div class="liBody" id="liBody"></div>
           <img id="liImage" class="liImage" alt="attached image" />
@@ -299,6 +299,9 @@
   </div>
 
 <script>
+  // ========= CONFIG: set your LinkedIn company page URL once =========
+  const COMPANY_LINKEDIN_URL = 'https://www.linkedin.com/company/crm-hacker/'; // <-- update if needed
+
   // ===== DOM helpers
   const $ = (s,ctx=document)=>ctx.querySelector(s);
   const $$ = (s,ctx=document)=>Array.from(ctx.querySelectorAll(s));
@@ -395,6 +398,7 @@
   // Selection-aware apply
   function applyToSelectionOrAll(transform){
     const el = input;
+    aaaaa
     const start = el.selectionStart ?? 0, end = el.selectionEnd ?? 0;
     if(end > start){
       const before = el.value.slice(0,start);
@@ -676,29 +680,17 @@
 
   // *** UPDATED CLEAR FORMATTING: keep text, strip formatting ***
   $('#clearBtn').addEventListener('click', ()=>{
-    // Keep existing text, remove Unicode styling & overlays
     let plain = demapToPlain(input.value).normalize('NFKD');
     plain = removeCombining(plain);
-
-    // Remove bullets, numbers, and quotes
     plain = stripBullets(stripNumbers(stripQuotes(plain)));
-
-    // Write back
     input.value = plain;
-
-    // Reset all toggles/radios (but keep text intact)
     ['stBold','stItalic','stBullets','stNumbers','stQuote',
      'upper','lower','title','tiny','sub','sup','clean',
      'ovStrike','ovUnder','ovOver','ovSlash','ovWavy','ovDot','ovRing','sentStrike']
       .forEach(id=>{ const el = document.getElementById(id); if(el) el.checked = false; });
-
     document.querySelectorAll('input[name="font"]').forEach(el=> el.checked = false);
     document.querySelector('input[name="sort"][value="none"]').checked = true;
-
-    // Clear recommendations but keep the text
     $('#recoArea').innerHTML = '';
-
-    // Update counts and preview
     runFormatPreviewOnly();
   });
 
@@ -859,6 +851,13 @@ END:VCALENDAR`;
   }
   $('#postNowBtn').addEventListener('click', openLinkedInComposerWithClipboard);
   $('#icsBtn').addEventListener('click', downloadICS);
+
+  // ===== “Follow” button behavior =====
+  // Note: LinkedIn requires authentication + server-side/OAuth to auto-follow.
+  // This client-side button opens the CRM Hacker page in a new tab so users can click Follow.
+  $('#followBtn').addEventListener('click', ()=>{
+    window.open(COMPANY_LINKEDIN_URL, '_blank', 'noopener');
+  });
 
   // Init
   updateCounts();
