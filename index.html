@@ -87,7 +87,8 @@
     .toolset{display:none}
     .toolset.active{display:block}
 
-    .schedule{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px;padding:10px;border:1px dashed var(--line);border-radius:10px;background:#fff}
+    /* Schedule block now lives on the RIGHT column */
+    .schedule{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0;padding:10px;border:1px dashed var(--line);border-radius:10px;background:#fff}
     .schedule input[type="datetime-local"]{border:1px solid var(--line);border-radius:8px;padding:6px 8px}
     .tz{font-size:12px;color:var(--muted)}
   </style>
@@ -120,15 +121,6 @@
           <button class="btn" id="randomBtn">Randomize</button>
           <button class="btn" id="clearBtn">Clear Formatting</button>
           <span class="muted" id="counts">0 chars • 0 words</span>
-        </div>
-
-        <!-- Schedule & Post -->
-        <div class="schedule">
-          <strong>Schedule & Post</strong>
-          <input id="postWhen" type="datetime-local">
-          <span class="tz" id="tzInfo"></span>
-          <button class="btn" id="postNowBtn">Post / Schedule on LinkedIn</button>
-          <button class="btn link" id="icsBtn">Add to Calendar (.ics)</button>
         </div>
 
         <div class="divider"></div>
@@ -219,18 +211,29 @@
         <div class="muted">© CRM Hacker</div>
       </div>
 
-      <!-- RIGHT: LinkedIn preview -->
+      <!-- RIGHT: Post actions + Preview -->
       <div class="card previewShell">
         <h3 style="margin-top:0">Preview</h3>
+
         <div class="deviceRow">
           <label class="chip"><input type="radio" name="device" value="desktop" checked> Desktop</label>
           <label class="chip"><input type="radio" name="device" value="mobile"> Mobile</label>
           <div class="chip"><input type="file" id="imagePick" accept="image/*"><span>Attach image</span></div>
           <button class="btn good" id="copyBtn">Copy Output</button>
         </div>
+
         <div style="height:8px"></div>
         <div class="meter"><i id="meterBar" style="width:0%"></i></div>
         <div class="muted" id="limitInfo" style="margin-top:4px">0 / 3000</div>
+
+        <!-- MOVED HERE: Schedule & Post (above preview) -->
+        <div class="schedule">
+          <strong>Schedule & Post</strong>
+          <input id="postWhen" type="datetime-local">
+          <span class="tz" id="tzInfo"></span>
+          <button class="btn" id="postNowBtn">Post / Schedule on LinkedIn</button>
+          <button class="btn link" id="icsBtn">Add to Calendar (.ics)</button>
+        </div>
 
         <div id="preview" class="preview" style="margin-top:12px;max-width:760px">
           <div class="liTop">
@@ -430,7 +433,7 @@
   function recommendVariants(src){
     const variants = [];
     variants.push({ label:'Headline', desc:'Bold + Title Case for hooks', text: mapRun(toTitle(src),'bold') });
-    variants.push({ label:'Emphasis', desc:'Italic + Underline', text: overlay(mapRun(src,'italic'),[CM.underline]) });
+    variants.push({ label:'Emphasis', desc:'Italic + Underline', text: overlay(mapRun(src),'italic') ? overlay(mapRun(src,'italic'),[CM.underline]) : overlay(src,[CM.underline]) });
     variants.push({ label:'Clean', desc:'Small caps—subtle polish', text: mapRun(src,'smallcaps') });
     const perSentence = sentenceStrike(src);
     variants.push({ label:'Callout', desc:'Strike per sentence', text: perSentence });
@@ -518,7 +521,6 @@
     if(!base.trim()){ alert('Add some text first.'); return; }
     const v = randomizeFrom(base);
     liBody.textContent = v;
-    // also keep counts in sync
     updateCounts();
   });
   $('#clearBtn').addEventListener('click', ()=>{
@@ -563,32 +565,28 @@
   ];
   $$(liveSelectors.join(',')).forEach(el=> el.addEventListener('change', runFormat));
 
-  // ====== Schedule & Post ======
+  // ====== Schedule & Post (RIGHT column) ======
   function openLinkedInComposerWithClipboard(){
     const text = liBody.textContent || input.value || '';
     if(!text.trim()){ alert('Write or format something first.'); return; }
 
-    // Try Web Share (mobile/tablet)
     const openComposer = ()=>{
-      // Open feed composer; user can click the clock icon to schedule
+      // LinkedIn composer; user can click the clock icon to schedule
       window.open('https://www.linkedin.com/feed/?shareActive=true','_blank','noopener');
+      setTimeout(()=>alert('Your text is copied. In LinkedIn’s composer, paste (Cmd/Ctrl+V). To schedule, click the clock icon to pick date/time.'), 250);
     };
 
-    if(navigator.share){
-      navigator.share({ text })
-        .catch(()=>{/* ignore */})
-        .finally(()=>{
-          navigator.clipboard.writeText(text).finally(()=>{
-            openComposer();
-            setTimeout(()=>alert('Your text is copied. In the LinkedIn composer, click the “Schedule” (clock) icon to pick date & time.'), 300);
-          });
-        });
-    } else {
-      navigator.clipboard.writeText(text).finally(()=>{
+    // Always copy first
+    navigator.clipboard.writeText(text).finally(()=>{
+      // Try Web Share as a bonus on mobile
+      if(navigator.share){
+        navigator.share({ text })
+          .catch(()=>{/* ignore */})
+          .finally(openComposer);
+      } else {
         openComposer();
-        setTimeout(()=>alert('Your text is copied. In the LinkedIn composer, click the “Schedule” (clock) icon to pick date & time.'), 300);
-      });
-    }
+      }
+    });
   }
 
   function pad(n){return String(n).padStart(2,'0');}
