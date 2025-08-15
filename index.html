@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CRM Hacker – LinkedIn Text Formatter</title>
-  <meta name="description" content="AuthoredUp‑style LinkedIn text formatter reimagined for CRM Hacker. Bold, italic, underline, strikethrough, lists, fancy Unicode fonts, sentence strike, staircase (sort by length), device preview, image attach, copy to clipboard.">
+  <meta name="description" content="AuthoredUp-style LinkedIn text formatter reimagined for CRM Hacker. Bold, italic, underline, strikethrough, lists, fancy Unicode fonts, sentence strike, staircase (sort by length), device preview, image attach, copy to clipboard.">
   <style>
     :root{
       /* CRM Hacker brand */
@@ -82,6 +82,15 @@
     .gridFonts{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
 
     .footerNote{color:#ffd1d1;background:#170909;border:1px solid #3b0d0d;border-radius:10px;padding:8px 10px;margin-top:10px}
+
+    /* Recommendations */
+    .recoGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:8px}
+    .recoCard{background:#0f1320;border:1px solid #2a2f47;border-radius:12px;padding:10px}
+    .recoHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+    .recoTitle{font-weight:700}
+    .recoDesc{color:var(--muted);font-size:12px}
+    .recoText{white-space:pre-wrap;word-break:break-word;background:#0b0d14;border:1px solid #25283a;border-radius:8px;padding:8px;margin:8px 0;max-height:160px;overflow:auto}
+    .recoBtns{display:flex;gap:8px}
   </style>
 </head>
 <body>
@@ -91,7 +100,8 @@
       <img src="logo.png" alt="CRM Hacker logo" onerror="this.style.display='none'">
       <div class="brand">
         <h1>CRM Hacker — LinkedIn Text Formatter</h1>
-        <div class="tag">FUBU: For Us, By Us • Built by CRM Hacker</div>
+        <!-- Tagline kept but without FUBU -->
+        <div class="tag">Built by CRM Hacker</div>
       </div>
     </div>
 
@@ -120,9 +130,12 @@ Busy work. Busy work. Busy work.</textarea>
         <div style="height:8px"></div>
         <div class="controls">
           <button class="btn primary" id="formatBtn">Format → Preview</button>
-          <button class="btn" id="swapBtn">Swap ↔</button>
+          <button class="btn" id="recommendBtn">Recommend formatting</button>
           <span class="muted" id="counts">0 chars • 0 words</span>
         </div>
+
+        <!-- Where recommendations will render -->
+        <div id="recoArea"></div>
 
         <!-- Sorting / Staircase -->
         <div class="groupTitle">Sort / Staircase</div>
@@ -130,7 +143,7 @@ Busy work. Busy work. Busy work.</textarea>
           <label class="chip"><input type="radio" name="sort" value="none" checked> None</label>
           <label class="chip"><input type="radio" name="sort" value="asc"> Short → Long</label>
           <label class="chip"><input type="radio" name="sort" value="desc"> Long → Short</label>
-          <label class="chip"><input type="radio" name="sort" value="stair"> Staircase (S‑L‑S)</label>
+          <label class="chip"><input type="radio" name="sort" value="stair"> Staircase (S-L-S)</label>
           <span class="muted">Reorders by line length.</span>
         </div>
 
@@ -159,7 +172,7 @@ Busy work. Busy work. Busy work.</textarea>
           <label class="chip"><input type="checkbox" id="clean"> Remove marks</label>
         </div>
 
-        <div class="footerNote">© CRM Hacker • FUBU: For Us, By Us</div>
+        <div class="footerNote">© CRM Hacker</div>
       </div>
 
       <!-- RIGHT: LinkedIn preview -->
@@ -280,7 +293,7 @@ Busy work. Busy work. Busy work.</textarea>
   };
 
   const FONT_OPTIONS=[
-    ['bold','Bold'],['italic','Italic'],['boldItalic','Bold Italic'],['sans','Sans'],['sansBold','Sans Bold'],['mono','Monospace'],['scriptBold','Cursive'],['frakturBold','Fraktur'],['doublestruck','Double‑struck'],['fullwidth','Fullwidth'],['circled','Circled'],['squared','Squared'],['smallcaps','Small caps']
+    ['bold','Bold'],['italic','Italic'],['boldItalic','Bold Italic'],['sans','Sans'],['sansBold','Sans Bold'],['mono','Monospace'],['scriptBold','Cursive'],['frakturBold','Fraktur'],['doublestruck','Double-struck'],['fullwidth','Fullwidth'],['circled','Circled'],['squared','Squared'],['smallcaps','Small caps']
   ];
 
   const fontsGrid = $('#fontsGrid');
@@ -360,6 +373,55 @@ Busy work. Busy work. Busy work.</textarea>
     updateCounts();
   }
 
+  // ===== Recommendations
+  function looksLikeList(s){ return /^\s*[-•\d]/m.test(s) || s.split('\n').filter(x=>x.trim()).length >= 3; }
+  function toBullets(s){ return s.split(/\n/).map(l=> l.trim()? '• '+l.replace(/^([•\-\*\d\.]+\s*)/,'') : '').join('\n'); }
+  function recommendVariants(src){
+    const variants = [];
+    variants.push({ label:'Headline', desc:'Bold + Title Case for hooks', text: mapRun(toTitle(src),'bold') });
+    variants.push({ label:'Emphasis', desc:'Italic + Underline', text: overlay(mapRun(src,'italic'),['\u0332']) });
+    variants.push({ label:'Clean', desc:'Small caps—subtle polish', text: mapRun(src,'smallcaps') });
+    const perSentence = [...src].map(ch => (ch===' '||ch==='\n')? ch : ch+'\u0336').join('');
+    variants.push({ label:'Callout', desc:'Strike per sentence', text: perSentence });
+    if (looksLikeList(src)) variants.push({ label:'List', desc:'Auto-bulleted', text: toBullets(src) });
+    else variants.push({ label:'Punchy', desc:'Bold + Strike', text: overlay(mapRun(src,'bold'),['\u0336']) });
+    variants.push({ label:'Subtle', desc:'Title + Underline', text: overlay(toTitle(src),['\u0332']) });
+    variants.push({ label:'Monospace', desc:'Code-style clarity', text: mapRun(src,'mono') });
+    variants.push({ label:'Cursive', desc:'Script for taglines', text: mapRun(src,'scriptBold') });
+    return variants;
+  }
+  function renderRecommendations(list){
+    const host = document.getElementById('recoArea');
+    if (!list || !list.length){ host.innerHTML = ''; return; }
+    host.innerHTML = `<div class="groupTitle">Recommended formatting</div>
+      <div class="recoGrid">
+        ${list.map((v,i)=>`
+          <div class="recoCard">
+            <div class="recoHead"><div class="recoTitle">${v.label}</div></div>
+            <div class="recoDesc">${v.desc}</div>
+            <div class="recoText" id="recoText_${i}">${v.text}</div>
+            <div class="recoBtns">
+              <button class="btn" data-use="${i}">Use this</button>
+              <button class="btn" data-copy="${i}">Copy</button>
+            </div>
+          </div>`).join('')}
+      </div>`;
+    host.querySelectorAll('[data-use]').forEach(btn=>{
+      btn.addEventListener('click', e=>{
+        const idx = +e.currentTarget.dataset.use;
+        liBody.textContent = list[idx].text;
+      });
+    });
+    host.querySelectorAll('[data-copy]').forEach(btn=>{
+      btn.addEventListener('click', async e=>{
+        const idx = +e.currentTarget.dataset.copy;
+        await navigator.clipboard.writeText(list[idx].text);
+        e.currentTarget.textContent = 'Copied!';
+        setTimeout(()=> e.currentTarget.textContent='Copy', 900);
+      });
+    });
+  }
+
   // image upload for preview
   $('#imagePick').addEventListener('change', (e)=>{
     const f = e.target.files?.[0]; if(!f) return; const url = URL.createObjectURL(f); const im = $('#liImage'); im.src=url; im.style.display='block';
@@ -372,7 +434,7 @@ Busy work. Busy work. Busy work.</textarea>
 
   // wire buttons
   $('#formatBtn').addEventListener('click', runFormat);
-  $('#swapBtn').addEventListener('click', ()=>{ const t=liBody.textContent||''; liBody.textContent=input.value; input.value=t; updateCounts();});
+  $('#recommendBtn').addEventListener('click', ()=> renderRecommendations(recommendVariants(input.value||'')));
   $('#copyBtn').addEventListener('click', ()=> navigator.clipboard.writeText(liBody.textContent||''));
 
   // live counts and initial preview
