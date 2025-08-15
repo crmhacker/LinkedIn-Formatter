@@ -346,7 +346,7 @@
   const subMap=new Map(Object.entries({a:'ₐ',e:'ₑ',h:'ₕ',i:'ᵢ',j:'ⱼ',k:'ₖ',l:'ₗ',m:'ₘ',n:'ₙ',o:'ₒ',p:'ₚ',r:'ᵣ',s:'ₛ',t:'ₜ',u:'ᵤ',v:'ᵥ',x:'ₓ',0:'₀',1:'₁',2:'₂',3:'₃',4:'₄',5:'₅',6:'₆',7:'₇',8:'₈',9:'₉'}));
   const supMap=new Map(); 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-=()'.split('').forEach(ch=>{supMap.set(ch,tinyMap.get(ch)||({'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','+':'⁺','-':'⁻','=':'⁼','(':'⁽',')':'⁾'})[ch]||ch)});
 
-  // Build reverse maps (to strip a selection back to plain before re-applying a style)
+  // Build reverse maps (strip to plain)
   function buildReverseMap(srcMap){
     const rev=new Map();
     srcMap.forEach((v,k)=>{ rev.set(v,k); });
@@ -361,7 +361,6 @@
 
   // Combined “any fancy -> ASCII” reverse
   const reverseAll = new Map();
-  // order matters; later sets can overwrite earlier (that’s fine for our use)
   [reverseMaps.bold, reverseMaps.italic, reverseMaps.boldItalic, reverseMaps.sans, reverseMaps.sansBold, reverseMaps.mono,
    reverseMaps.scriptBold, reverseMaps.frakturBold, reverseMaps.doublestruck, reverseMaps.fullwidth, reverseMaps.circled,
    reverseMaps.squared, reverseMaps.smallcaps, tinyRev, subRev, supRev].forEach(r=>{
@@ -413,19 +412,14 @@
 
   // === TRUE TOGGLES FOR MINI BAR ===
   function toggleFontSel(s, fontId){
-    // Normalize selection to plain, then apply font if not already fully that font.
     const base = demapToPlain(s);
     const reapplied = mapRun(base, fontId);
     return (s === reapplied) ? base : reapplied;
   }
   function toggleBold(s){ return toggleFontSel(s,'bold'); }
   function toggleItalic(s){ return toggleFontSel(s,'italic'); }
-  function toggleUnderline(s){
-    return s.includes(CM.underline) ? removeSpecific(s, CM.underline) : overlay(s,[CM.underline]);
-  }
-  function toggleStrike(s){
-    return s.includes(CM.strike) ? removeSpecific(s, CM.strike) : overlay(s,[CM.strike]);
-  }
+  function toggleUnderline(s){ return s.includes(CM.underline) ? removeSpecific(s, CM.underline) : overlay(s,[CM.underline]); }
+  function toggleStrike(s){ return s.includes(CM.strike) ? removeSpecific(s, CM.strike) : overlay(s,[CM.strike]); }
   function toggleBullets(s){ return isBulleted(s) ? stripBullets(s) : applyBullets(s); }
   function toggleNumbers(s){ return isNumbered(s) ? stripNumbers(s) : applyNumbers(s); }
   function toggleQuote(s){ return isQuoted(s) ? stripQuotes(s) : applyQuotes(s); }
@@ -565,7 +559,7 @@
     updateCounts();
   }
 
-  // Recommendations / Randomize (unchanged from previous good build)
+  // Recommendations / Randomize
   function randPick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
   function coin(p=0.5){ return Math.random()<p; }
   function looksLikeList(s){ return /^\s*[-•\d]/m.test(s) || s.split('\n').filter(x=>x.trim()).length >= 3; }
@@ -679,16 +673,35 @@
     liBody.textContent = v;
     updateCounts();
   });
+
+  // *** UPDATED CLEAR FORMATTING: keep text, strip formatting ***
   $('#clearBtn').addEventListener('click', ()=>{
-    input.value='';
-    liBody.textContent='';
-    ['stBold','stItalic','stBullets','stNumbers','stQuote','upper','lower','title','tiny','sub','sup','clean','ovStrike','ovUnder','ovOver','ovSlash','ovWavy','ovDot','ovRing','sentStrike']
+    // Keep existing text, remove Unicode styling & overlays
+    let plain = demapToPlain(input.value).normalize('NFKD');
+    plain = removeCombining(plain);
+
+    // Remove bullets, numbers, and quotes
+    plain = stripBullets(stripNumbers(stripQuotes(plain)));
+
+    // Write back
+    input.value = plain;
+
+    // Reset all toggles/radios (but keep text intact)
+    ['stBold','stItalic','stBullets','stNumbers','stQuote',
+     'upper','lower','title','tiny','sub','sup','clean',
+     'ovStrike','ovUnder','ovOver','ovSlash','ovWavy','ovDot','ovRing','sentStrike']
       .forEach(id=>{ const el = document.getElementById(id); if(el) el.checked = false; });
-    document.querySelectorAll('input[name="font"]').forEach(el=> el.checked=false);
-    document.querySelector('input[name="sort"][value="none"]').checked=true;
-    $('#recoArea').innerHTML='';
-    updateCounts();
+
+    document.querySelectorAll('input[name="font"]').forEach(el=> el.checked = false);
+    document.querySelector('input[name="sort"][value="none"]').checked = true;
+
+    // Clear recommendations but keep the text
+    $('#recoArea').innerHTML = '';
+
+    // Update counts and preview
+    runFormatPreviewOnly();
   });
+
   $('#copyBtn').addEventListener('click', ()=> navigator.clipboard.writeText(liBody.textContent||''));
 
   // Toolkit picker visibility
@@ -719,7 +732,9 @@
     if(hasSel){
       const id = el.id, name = el.name;
       const mapControlToTransform = {
-        stBullets: s=>toggleBullets(s), stNumbers: s=>toggleNumbers(s), stQuote: s=>toggleQuote(s),
+        stBullets: s=> (isBulleted(s)? stripBullets(s): applyBullets(s)),
+        stNumbers: s=> (isNumbered(s)? stripNumbers(s): applyNumbers(s)),
+        stQuote:   s=> (isQuoted(s)? stripQuotes(s): applyQuotes(s)),
         upper: s=>s.toUpperCase(), lower: s=>s.toLowerCase(), title: s=>toTitle(s),
         tiny: s=>toggleTiny(s), sub: s=>toggleSub(s), sup: s=>toggleSup(s),
         clean: s=>clearSel(s),
@@ -756,7 +771,6 @@
     const shift = e.shiftKey;
     const alt = e.altKey;
 
-    // helper that applies selection-aware
     const doAct = (fn)=>{
       e.preventDefault();
       applyToSelectionOrAll(fn);
@@ -777,7 +791,7 @@
     }
   });
 
-  // Image + composer + ICS (same as before)
+  // Image + composer + ICS
   $('#imagePick').addEventListener('change', (e)=>{
     const f = e.target.files?.[0]; if(!f) return; const url = URL.createObjectURL(f);
     const im = $('#liImage'); im.src=url; im.style.display='block';
@@ -847,8 +861,8 @@ END:VCALENDAR`;
   $('#icsBtn').addEventListener('click', downloadICS);
 
   // Init
-  updateCounts(); 
-  liBody.textContent=''; // start empty
+  updateCounts();
+  liBody.textContent='';
 </script>
 </body>
 </html>
