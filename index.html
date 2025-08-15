@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CRM Hacker – LinkedIn Text Formatter</title>
-  <meta name="description" content="CRM Hacker LinkedIn text formatter: bold, italic, underline, strikethrough, Unicode fonts (script, fraktur, double-struck), bullets, numbers, title case, sentence strike, staircase sorting, live LinkedIn preview, copy to clipboard. Includes expert LinkedIn formatting FAQs.">
+  <title>CRM Hacker – LinkedIn Text Formatter | Salesforce & RevOps Post Styling</title>
+  <meta name="description" content="CRM Hacker LinkedIn text formatter for Salesforce & RevOps teams: bold, italic, underline, strikethrough, Unicode fonts, bullets, numbers, title case, staircase sorting, live LinkedIn preview, copy to clipboard, plus expert FAQs for Sales Cloud, CRM migrations, and enablement.">
+  <meta name="keywords" content="LinkedIn text formatter, Salesforce, RevOps, Sales Cloud, CRM migrations, revenue operations, LinkedIn formatting, Unicode bold, italics, strikethrough, CRM Hacker">
   <style>
     :root{
       --accent:#ff2c2c; --accent-2:#ff5858;
@@ -19,6 +20,7 @@
     .topbar img{height:54px;width:auto;background:#000;border-radius:10px;padding:3px;border:1px solid #2a2f47;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35))}
     .brand h1{margin:0;font-size:24px}
     .tag{display:inline-flex;gap:8px;align-items:center;color:#ffd1d1;background:#170909;border:1px solid #3b0d0d;border-radius:999px;padding:6px 10px;font-size:12px}
+    .hero{margin:8px 0 18px;color:#dfe3ff;line-height:1.55}
     .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
     @media (max-width:1024px){.grid{grid-template-columns:1fr}}
     .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 28px rgba(0,0,0,.35)}
@@ -81,6 +83,19 @@
       </div>
     </div>
 
+    <!-- Hero / value copy -->
+    <div class="card pad">
+      <p class="hero">
+        Format LinkedIn posts that <b>convert</b>—without fighting the editor. This free tool from <b>CRM Hacker</b> helps Salesforce and RevOps teams
+        style text (bold, italics, strikethrough, Unicode fonts, bullets, title case) and preview it exactly like LinkedIn. Perfect for
+        <b>Sales Cloud</b> launches, <b>CRM migrations</b>, revenue operations insights, partner announcements, enablement tips, and hiring posts.
+      </p>
+      <p class="hero" style="margin-top:-6px">
+        <b>Need it dialed to your niche?</b> If you want me to tune the FAQ copy for specific <b>CRM Hacker</b> keywords
+        (e.g., <b>Salesforce</b>, <b>RevOps</b>, <b>Sales Cloud</b>, <b>CRM migrations</b>), say the word and I’ll drop in an SEO-juiced version.
+      </p>
+    </div>
+
     <div class="grid">
       <!-- LEFT: Editor + controls -->
       <div class="card pad">
@@ -107,13 +122,12 @@ Busy work. Busy work. Busy work.</textarea>
           <span class="muted" id="counts">0 chars • 0 words</span>
         </div>
 
-        <!-- Visual style palette (like AuthoredUp: shows how it will look) -->
+        <!-- Visual style palette (shows how styles will look) -->
         <div class="palette" id="fontsGrid"></div>
 
-        <!-- Recommendations will render here -->
+        <!-- Recommendations -->
         <div id="recoArea"></div>
 
-        <!-- Sorting / Staircase -->
         <div class="divider"></div>
         <div class="groupTitle">Sort / Staircase</div>
         <div class="toolbar">
@@ -134,17 +148,6 @@ Busy work. Busy work. Busy work.</textarea>
           <label class="chip"><input type="checkbox" id="ovDot"> Dot above</label>
           <label class="chip"><input type="checkbox" id="ovRing"> Ring above</label>
           <label class="chip"><input type="checkbox" id="sentStrike"> Strike per sentence</label>
-        </div>
-
-        <div class="divider"></div>
-        <div class="toolbar">
-          <label class="chip"><input type="checkbox" id="upper"> UPPER</label>
-          <label class="chip"><input type="checkbox" id="lower"> lower</label>
-          <label class="chip"><input type="checkbox" id="title"> Title</label>
-          <label class="chip"><input type="checkbox" id="tiny"> Tiny</label>
-          <label class="chip"><input type="checkbox" id="sub"> Sub</label>
-          <label class="chip"><input type="checkbox" id="sup"> Sup</label>
-          <label class="chip"><input type="checkbox" id="clean"> Remove marks</label>
         </div>
 
         <div class="divider"></div>
@@ -183,88 +186,71 @@ Busy work. Busy work. Busy work.</textarea>
       </div>
     </div>
 
+    <!-- Body copy / positioning for SEO -->
+    <div class="card pad" style="margin-top:16px">
+      <h2 style="margin:0 0 6px">Why format with CRM Hacker?</h2>
+      <p class="hero" style="margin:0">
+        We’re a Salesforce-first RevOps consultancy. This formatter reflects how we write for <b>Sales Cloud</b> rollouts,
+        <b>CRM migrations</b>, pipeline hygiene updates, partner enablement, and <b>revenue operations</b> playbooks—concise hooks,
+        scannable lists, and clean CTAs that move deals forward.
+      </p>
+    </div>
+
     <!-- FAQs -->
     <div class="card pad faq">
       <h2>LinkedIn Text Formatting FAQs (CRM Hacker)</h2>
 
-      <details>
-        <summary>What’s the best way to format LinkedIn posts for reach and readability?</summary>
-        <div class="faq-body">
-          Lead with a <b>2–3 line hook</b>, keep lines short (40–80 chars), use <b>white space</b>, prefer
-          <b>bullets</b> for skimmability, and highlight key phrases with <b>Unicode bold</b>/<b>italic</b>. Finish with a clear
-          <b>CTA</b> (comment, DM, link in comments). Keep emojis relevant and sparing.
-        </div>
+      <details><summary>What’s the best way to format LinkedIn posts for reach and readability?</summary>
+        <div class="faq-body">Lead with a <b>2–3 line hook</b>, keep lines short (40–80 chars), use <b>white space</b>, prefer
+        <b>bullets</b> for skimmability, and highlight key phrases with <b>Unicode bold</b>/<b>italic</b>. Finish with a clear
+        <b>CTA</b> (comment, DM, link in comments). Keep emojis relevant and sparing.</div>
       </details>
 
-      <details>
-        <summary>Bold vs Italic vs Strikethrough — when should I use each?</summary>
-        <div class="faq-body">
-          <b>Bold</b> for key outcomes, numbers, and CTAs. <i>Italic</i> for nuance or subtext. <span style="text-decoration:line-through">Strikethrough</span> for contrast, humor, and pattern break (use sparingly, ideally per-sentence).
-        </div>
+      <details><summary>Bold vs Italic vs Strikethrough — when should I use each?</summary>
+        <div class="faq-body"><b>Bold</b> for key outcomes, numbers, and CTAs. <i>Italic</i> for nuance or subtext.
+        <span style="text-decoration:line-through">Strikethrough</span> for contrast, humor, and pattern break (use sparingly, ideally per-sentence).</div>
       </details>
 
-      <details>
-        <summary>Do special fonts (script, fraktur, double-struck) hurt performance?</summary>
-        <div class="faq-body">
-          Unicode fonts are indexable but can look spammy if overused. Use fancy fonts for <b>single lines</b> (hooks, dividers,
-          taglines). For the body, stick to bold/italic/underline and bullets.
-        </div>
+      <details><summary>Do special fonts (script, fraktur, double-struck) hurt performance?</summary>
+        <div class="faq-body">Unicode fonts are indexable but can look spammy if overused. Use fancy fonts for <b>single lines</b>
+        (hooks, dividers, taglines). For the body, stick to bold/italic/underline and bullets.</div>
       </details>
 
-      <details>
-        <summary>Optimal post length and structure for LinkedIn SEO?</summary>
-        <div class="faq-body">
-          900–1500 characters performs well. Structure: <b>Hook → Context → Value bullets → CTA</b>.
-          Include <b>2–5 relevant hashtags</b> at the end (niche + category).
-        </div>
+      <details><summary>Optimal post length and structure for LinkedIn SEO?</summary>
+        <div class="faq-body">900–1500 characters performs well. Structure: <b>Hook → Context → Value bullets → CTA</b>.
+        Include <b>2–5 relevant hashtags</b> at the end (niche + category).</div>
       </details>
 
-      <details>
-        <summary>How do I format case (UPPER, Title Case, etc.) for impact?</summary>
-        <div class="faq-body">
-          Use <b>Title Case</b> for headings and hooks. <b>UPPERCASE</b> only for short callouts or acronyms. Avoid
-          long blocks in UPPER — it feels shouty and reduces readability.
-        </div>
+      <details><summary>How do I format case (UPPER, Title Case, etc.) for impact?</summary>
+        <div class="faq-body">Use <b>Title Case</b> for headings and hooks. <b>UPPERCASE</b> only for short callouts or acronyms.
+        Avoid long blocks in UPPER — it feels shouty and reduces readability.</div>
       </details>
 
-      <details>
-        <summary>When should I format lists vs paragraphs?</summary>
-        <div class="faq-body">
-          Use <b>bullets</b> when listing benefits, steps, or insights (3–7 bullets). Use a short paragraph when telling a story
-          or making a single point. You can mix them: short para → bullets → CTA.
-        </div>
+      <details><summary>When should I format lists vs paragraphs?</summary>
+        <div class="faq-body">Use <b>bullets</b> when listing benefits, steps, or insights (3–7 bullets). Use a short paragraph when telling a story
+        or making a single point. You can mix them: short para → bullets → CTA.</div>
       </details>
 
-      <details>
-        <summary>What are the best hashtags and where should they go?</summary>
-        <div class="faq-body">
-          Place hashtags at the <b>end</b>. Use 2–5 tags: 1–2 niche (#RevOps, #SalesforceAdmin), 1–2 category
-          (#B2BMarketing, #SaaS), and optionally 1 branded (#CRMHacker).
-        </div>
+      <details><summary>Best LinkedIn hashtags for Salesforce & RevOps content?</summary>
+        <div class="faq-body">Place hashtags at the <b>end</b>. Mix: niche (#RevOps, #SalesforceAdmin, #SalesCloud),
+        category (#B2BMarketing, #SaaS, #RevenueOperations), and optionally branded <b>#CRMHacker</b>.</div>
       </details>
 
-      <details>
-        <summary>How do I preview mobile vs desktop formatting?</summary>
-        <div class="faq-body">
-          Use the <b>Desktop/Mobile</b> toggle above the preview to adjust width and check line breaks and fold length.
-        </div>
+      <details><summary>How do I preview mobile vs desktop formatting?</summary>
+        <div class="faq-body">Use the <b>Desktop/Mobile</b> toggle above the preview to adjust width and check line breaks and fold length.</div>
       </details>
 
-      <details>
-        <summary>Does LinkedIn support HTML or Markdown?</summary>
-        <div class="faq-body">
-          No. This tool uses <b>Unicode characters</b> (not HTML/Markdown), which render natively on LinkedIn and can be copied/pasted.
-        </div>
+      <details><summary>Does LinkedIn support HTML or Markdown?</summary>
+        <div class="faq-body">No. This tool uses <b>Unicode characters</b> (not HTML/Markdown), which render natively on LinkedIn and can be copied/pasted.</div>
       </details>
 
-      <details>
-        <summary>Advanced: sentence strike, staircase sorting, and visual dividers?</summary>
-        <div class="faq-body">
-          Use <b>Strike per sentence</b> for pattern breaks, <b>Staircase</b> to reorder lines by length (short→long or alternating),
-          and visual dividers like “—” or “⋯” to segment sections.
-        </div>
+      <details><summary>Advanced: sentence strike, staircase sorting, and visual dividers?</summary>
+        <div class="faq-body">Use <b>Strike per sentence</b> for pattern breaks, <b>Staircase</b> to reorder lines by length (short→long or alternating),
+        and visual dividers like “—” or “⋯” to segment sections.</div>
       </details>
     </div>
+
+    <div class="muted" style="text-align:center;margin:14px 0">© CRM Hacker</div>
   </div>
 
 <script>
@@ -317,7 +303,6 @@ Busy work. Busy work. Busy work.</textarea>
   const overlay=(s,marks)=>{const combo=marks.join('');return [...s].map(ch=> (ch===' '||ch==='\n')? ch : ch+combo).join('');}
   const transformWithMap=(s,map)=>[...s].map(ch=> map.get(ch)||ch).join('');
   const toTitle=s=>s.toLowerCase().replace(/\b([a-z])(\w*)/g,(_,h,rest)=>h.toUpperCase()+rest);
-
   function mapRun(s,id){ const m = MAPS[id]; return m? transformWithMap(s,m) : s; }
 
   // ===== Palette (visual font chips with sample)
@@ -345,17 +330,14 @@ Busy work. Busy work. Busy work.</textarea>
     row.append(rb, txt, sample); fontsGrid.appendChild(row);
   });
 
-  // ===== Actions that alter textarea selection or all text
-  const inputEl = input;
+  // ===== Text actions (selection-aware)
   function applyToSelection(fn){
-    const start = inputEl.selectionStart, end = inputEl.selectionEnd;
+    const el = input; const start = el.selectionStart, end = el.selectionEnd;
     if(start !== end){
-      const before = inputEl.value.slice(0,start);
-      const sel = inputEl.value.slice(start,end);
-      const after = inputEl.value.slice(end);
-      const out = fn(sel); inputEl.value = before + out + after;
-      inputEl.selectionStart = start; inputEl.selectionEnd = start + out.length;
-    } else { inputEl.value = fn(inputEl.value); }
+      const before = el.value.slice(0,start), sel = el.value.slice(start,end), after = el.value.slice(end);
+      const out = fn(sel); el.value = before + out + after;
+      el.selectionStart = start; el.selectionEnd = start + out.length;
+    } else { el.value = fn(el.value); }
     updateCounts();
   }
   function actBold(s){ return mapRun(s,'bold'); }
@@ -382,24 +364,19 @@ Busy work. Busy work. Busy work.</textarea>
   // Main formatter
   function runFormat(){
     let s = input.value || '';
-    if($('#upper').checked) s = s.toUpperCase();
-    else if($('#lower').checked) s = s.toLowerCase();
-    else if($('#title').checked) s = toTitle(s);
-
+    // case (simple demo: you can add toggles later if you want)
+    // sort
     const sortMode = ($('input[name="sort"]:checked')||{}).value || 'none';
     s = sortLines(s, sortMode);
-
+    // font map
     const font = ($('input[name="font"]:checked')||{}).value;
     if(font) s = mapRun(s, font);
-
-    if($('#tiny')){} // (reserved; tiny/sub/sup available if you later add the toggles back)
-
+    // overlays
     const marks=[]; if($('#ovStrike').checked) marks.push(CM.strike); if($('#ovUnder').checked) marks.push(CM.underline); if($('#ovOver').checked) marks.push(CM.overline); if($('#ovSlash').checked) marks.push(CM.slash); if($('#ovWavy').checked) marks.push(CM.wavy); if($('#ovDot').checked) marks.push(CM.dot); if($('#ovRing').checked) marks.push(CM.ring);
     if($('#sentStrike').checked && marks.includes(CM.strike)){
       s = [...s].map(ch=> (ch===' '||ch==='\n')? ch : ch+CM.strike).join('');
       s = overlay(s, marks.filter(m=>m!==CM.strike));
     } else if(marks.length){ s = overlay(s, marks); }
-
     liBody.textContent = s; updateCounts();
   }
 
