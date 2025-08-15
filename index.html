@@ -3,519 +3,184 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CRM Hacker – LinkedIn Text Formatter | Clean & Readable</title>
-  <meta name="description" content="CRM Hacker LinkedIn text formatter: bold, italic, underline, strikethrough, Unicode fonts, bullets, numbers, title case, upper/lower, tiny/sub/sup, staircase sorting, live LinkedIn preview, copy to clipboard, expert FAQs.">
+  <title>CRM Hacker – LinkedIn Text Formatter</title>
+  <meta name="description" content="LinkedIn text formatter for CRM Hacker. Bold, italic, underline, strikethrough, lists, fancy Unicode fonts, sentence strike, staircase sorting, device preview, image attach, copy to clipboard, and recommended formatting.">
   <style>
     :root{
-      --accent:#ff2c2c; --accent-2:#ff5858;
-      --bg:#f7f8fb; --panel:#ffffff;
-      --ink:#1b1f23; --muted:#5b6070; --line:#e6e8ef;
-      --ok:#18c37d; --warn:#b25b00; --li-blue:#0a66c2;
+      --accent:#ff2c2c;
+      --accent-2:#ff5858;
+      --bg:#faf9f7;   /* soft white background */
+      --panel:#ffffff;
+      --ink:#222222;
+      --muted:#555555;
+      --line:#ddd;
+      --ok:#18c37d;
+      --warn:#ffb020;
+      --li-blue:#0a66c2;
     }
-    *{box-sizing:border-box} html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-    a{color:var(--accent)}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
     .wrap{max-width:1280px;margin:28px auto;padding:0 16px}
-
     .topbar{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-    .topbar img{
-      height:54px;width:auto;
-      background:#f7f8fb; /* matches page bg */
-      border-radius:10px;padding:3px;border:1px solid #0001;box-shadow:0 2px 8px #00000014
-    }
+    .topbar img{height:54px;width:auto;background:var(--bg);border-radius:10px;padding:3px;border:1px solid var(--line);filter:drop-shadow(0 2px 6px rgba(0,0,0,.1))}
     .brand h1{margin:0;font-size:24px}
-    .tag{display:inline-flex;gap:8px;align-items:center;color:#8a2b2b;background:#fff7f7;border:1px solid #ffdede;border-radius:999px;padding:6px 10px;font-size:12px}
-
+    .tag{color:var(--muted);font-size:12px}
     .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
     @media (max-width:1024px){.grid{grid-template-columns:1fr}}
-
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 28px #00000010}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.05)}
     .pad{padding:14px}
-    .divider{height:1px;background:var(--line);margin:12px 0}
-
-    textarea{width:100%;min-height:220px;background:#fcfcfe;color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:16px;outline:none;resize:vertical}
-    .muted{color:var(--muted);font-size:12px}
-
-    /* Toolbar + buttons (reduced size) */
-    .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .tool{
-      display:inline-flex;align-items:center;justify-content:center;gap:4px;
-      padding:6px 7px; /* smaller */
-      border:1px solid var(--line);background:#fff;border-radius:8px;
-      color:var(--ink);cursor:pointer
-    }
-    .tool svg{width:16px;height:16px} /* smaller icons */
-    .tool:hover{transform:translateY(-1px);box-shadow:0 2px 8px #00000010}
+    .toolbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .tool{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:6px 8px;border:1px solid var(--line);background:#f5f5f5;border-radius:8px;color:var(--ink);cursor:pointer;font-size:14px}
+    .tool:hover{background:#eee}
+    textarea{width:100%;min-height:180px;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:16px;outline:none;resize:vertical}
     .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
-    .btn{
-      background:#fff;border:1px solid var(--line);color:var(--ink);
-      padding:8px 10px; /* smaller */
-      border-radius:10px;font-weight:600;cursor:pointer
-    }
-    .btn:hover{transform:translateY(-1px);box-shadow:0 2px 8px #00000010}
+    .btn{background:#f5f5f5;border:1px solid var(--line);color:var(--ink);padding:8px 10px;border-radius:8px;font-weight:600;cursor:pointer;font-size:14px}
     .btn.primary{background:var(--accent);border-color:var(--accent-2);color:#fff}
     .btn.good{background:var(--ok);border-color:#27da97;color:#fff}
-
-    /* Labels */
-    .groupTitle{display:flex;align-items:center;gap:6px;color:#2d3340;font-size:12px;margin:8px 0}
-
-    /* Visual style palette (fancy fonts) */
-    .palette{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-top:10px}
-    .chip{display:flex;align-items:center;gap:8px;padding:10px;border:1px solid var(--line);background:#fff;border-radius:10px;cursor:pointer}
+    .btn:hover{background:#eee}
+    .muted{color:var(--muted);font-size:12px}
+    .groupTitle{margin-top:12px;font-size:12px;color:var(--muted)}
+    .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid var(--line);background:#f9f9f9;border-radius:8px}
     .chip input{accent-color:var(--accent)}
-    .sample{margin-left:auto;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
-
-    /* Recommendations grid (under textarea) */
-    .recoGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin:10px 0}
-    .recoCard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px}
-    .recoHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-    .recoTitle{font-weight:700} .recoDesc{color:var(--muted);font-size:12px}
-    .recoText{white-space:pre-wrap;word-break:break-word;background:#fcfcfe;border:1px solid var(--line);border-radius:8px;padding:8px;margin:8px 0;max-height:180px;overflow:auto}
-    .recoBtns{display:flex;gap:8px}
-
-    /* Preview (right) */
     .previewShell{padding:12px}
-    .preview{background:#fff;color:#111;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+    .preview{background:#fff;color:#111;border-radius:12px;overflow:hidden;border:1px solid #d2d6de}
     .liTop{display:flex;gap:10px;align-items:flex-start;padding:12px}
-    .liTop img{
-      height:40px;width:40px;border-radius:50%;
-      background:#ffffff; /* pure white background for avatar */
-    }
-    .liName{font-weight:600} .liMeta{font-size:12px;color:#666}
+    .liTop img{height:40px;width:40px;border-radius:50%;background:#fff}
+    .liName{font-weight:600}
+    .liMeta{font-size:12px;color:#666}
     .liFollow{margin-left:auto;background:#0a66c2;color:#fff;border:0;border-radius:999px;padding:6px 10px;font-weight:600}
     .liBody{padding:0 12px 12px;white-space:pre-wrap;word-break:break-word}
     .liImage{width:100%;display:none;max-height:380px;object-fit:cover;background:#f5f6f8}
-    .liActions{display:flex;gap:18px;border-top:1px solid var(--line);padding:10px 12px;color:#5f6b7a;font-size:13px}
+    .liActions{display:flex;gap:18px;border-top:1px solid #eef1f5;padding:10px 12px;color:#5f6b7a;font-size:13px}
     .deviceRow{display:flex;align-items:center;gap:10px;margin:8px 0 0}
-    .meter{height:8px;background:#eef0f7;border-radius:999px;border:1px solid var(--line);overflow:hidden}
+    .deviceRow .chip{background:#f5f5f5}
+    .meter{height:8px;background:#eee;border-radius:999px;border:1px solid #ddd;overflow:hidden}
     .meter>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#ff9b73)}
+    .gridFonts{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
+    .footerNote{color:var(--muted);padding:8px 10px;margin-top:10px;font-size:12px;text-align:center}
+    .recommend-box{background:#fff5f5;border:1px solid var(--accent-2);border-radius:8px;padding:10px;margin-bottom:10px;font-size:14px}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="topbar">
-      <img src="logo.png" alt="CRM Hacker logo" onerror="this.style.display='none'">
-      <div class="brand">
-        <h1>CRM Hacker — LinkedIn Text Formatter</h1>
-        <div class="tag">Built by CRM Hacker</div>
-      </div>
-    </div>
-
-    <!-- Hero -->
-    <div class="card pad" style="margin-bottom:14px">
-      <p style="margin:0 0 6px;color:#2d3340">
-        Format LinkedIn posts that are clean, scannable, and on-brand—without fighting the editor. Paste your text, pick a style, preview, and copy.
-      </p>
-    </div>
-
-    <div class="grid">
-      <!-- LEFT: Editor + controls -->
-      <div class="card pad">
-        <h3 style="margin-top:0">Editor</h3>
-
-        <!-- Textarea -->
-        <textarea id="input" placeholder="Write or paste your post…">Busy ≠ productive. Especially in RevOps.
-Busy work. Busy work. Busy work.</textarea>
-
-        <!-- Primary controls -->
-        <div class="controls">
-          <button class="btn primary" id="formatBtn">Format → Preview</button>
-          <button class="btn" id="recommendBtn">Recommend formatting</button>
-          <button class="btn" id="clearBtn">Clear Formatting</button>
-          <span class="muted" id="counts">0 chars • 0 words</span>
-        </div>
-
-        <!-- RECOMMENDATIONS (beneath input, above formatting options) -->
-        <div id="recoArea"></div>
-
-        <div class="divider"></div>
-
-        <!-- Formatting options -->
-        <div class="toolbar" aria-label="toolbar" title="Apply to selection or whole text">
-          <button class="tool" data-act="bold" title="Bold">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 6h6a3 3 0 110 6H7zm0 6h7a3 3 0 110 6H7"/></svg>
-          </button>
-          <button class="tool" data-act="italic" title="Italic">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4h7M7 20h7M14 4L10 20"/></svg>
-          </button>
-          <button class="tool" data-act="underline" title="Underline">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6v6a6 6 0 0012 0V6"/><path d="M6 20h12"/></svg>
-          </button>
-          <button class="tool" data-act="strike" title="Strikethrough">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16"/></svg>
-          </button>
-          <span style="width:10px"></span>
-          <button class="tool" data-act="bullets" title="Bulleted list">
-            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="7" r="2"/><circle cx="6" cy="12" r="2"/><circle cx="6" cy="17" r="2"/><path d="M11 7h9M11 12h9M11 17h9" stroke="currentColor" stroke-width="2" fill="none"/></svg>
-          </button>
-          <button class="tool" data-act="numbers" title="Numbered list">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 7h10M10 12h10M10 17h10"/><path d="M5 8V6H3v2h2zM4 12h2v4H4m0 0h2"/></svg>
-          </button>
-          <button class="tool" data-act="quote" title="Quote">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7h7v6H7zM14 7h7v6h-7z"/></svg>
-          </button>
-          <button class="tool" data-act="clear" title="Clear formatting (selection/whole)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M10 7v10M7 17h6"/></svg>
-          </button>
-        </div>
-
-        <!-- Fancy fonts palette -->
-        <div class="palette" id="fontsGrid"></div>
-
-        <!-- Case + size + cleanup -->
-        <div class="groupTitle">Text transforms</div>
-        <div class="toolbar">
-          <label class="chip"><input type="checkbox" id="upper"> UPPER</label>
-          <label class="chip"><input type="checkbox" id="lower"> lower</label>
-          <label class="chip"><input type="checkbox" id="title"> Title Case</label>
-          <label class="chip"><input type="checkbox" id="tiny"> Tiny</label>
-          <label class="chip"><input type="checkbox" id="sub"> Sub</label>
-          <label class="chip"><input type="checkbox" id="sup"> Sup</label>
-          <label class="chip"><input type="checkbox" id="clean"> Remove marks</label>
-        </div>
-
-        <!-- Sorting / Staircase -->
-        <div class="groupTitle">Sort / Staircase</div>
-        <div class="toolbar">
-          <label class="chip"><input type="radio" name="sort" value="none" checked> None</label>
-          <label class="chip"><input type="radio" name="sort" value="asc"> Short → Long</label>
-          <label class="chip"><input type="radio" name="sort" value="desc"> Long → Short</label>
-          <label class="chip"><input type="radio" name="sort" value="stair"> Staircase (S-L-S)</label>
-          <span class="muted">Reorders by line length.</span>
-        </div>
-
-        <!-- Overlays -->
-        <div class="groupTitle">Overlays</div>
-        <div class="toolbar">
-          <label class="chip"><input type="checkbox" id="ovStrike"> Strikethrough</label>
-          <label class="chip"><input type="checkbox" id="ovUnder"> Underline</label>
-          <label class="chip"><input type="checkbox" id="ovOver"> Overline</label>
-          <label class="chip"><input type="checkbox" id="ovSlash"> Slash</label>
-          <label class="chip"><input type="checkbox" id="ovWavy"> Wavy</label>
-          <label class="chip"><input type="checkbox" id="ovDot"> Dot above</label>
-          <label class="chip"><input type="checkbox" id="ovRing"> Ring above</label>
-          <label class="chip"><input type="checkbox" id="sentStrike"> Strike per sentence</label>
-        </div>
-
-        <div class="divider"></div>
-        <div class="muted">© CRM Hacker</div>
-      </div>
-
-      <!-- RIGHT: LinkedIn preview -->
-      <div class="card previewShell">
-        <h3 style="margin-top:0">Preview</h3>
-        <div class="deviceRow">
-          <label class="chip"><input type="radio" name="device" value="desktop" checked> Desktop</label>
-          <label class="chip"><input type="radio" name="device" value="mobile"> Mobile</label>
-          <div class="chip"><input type="file" id="imagePick" accept="image/*"><span>Attach image</span></div>
-          <button class="btn good" id="copyBtn">Copy Output</button>
-        </div>
-        <div style="height:8px"></div>
-        <div class="meter"><i id="meterBar" style="width:0%"></i></div>
-        <div class="muted" id="limitInfo" style="margin-top:4px">0 / 3000</div>
-
-        <div id="preview" class="preview" style="margin-top:12px;max-width:760px">
-          <div class="liTop">
-            <img src="logo.png" alt="CRM Hacker avatar">
-            <div>
-              <div class="liName">CRM Hacker</div>
-              <div class="liMeta">Company • Just now • <span style="color:var(--li-blue)">#CRM #RevOps</span></div>
-            </div>
-            <button class="liFollow">Follow</button>
-          </div>
-          <div class="liBody" id="liBody"></div>
-          <img id="liImage" class="liImage" alt="attached image" />
-          <div class="liActions">
-            <span>👍 Like</span><span>💬 Comment</span><span>↗ Share</span><span>•••</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- FAQs -->
-    <div class="card pad" style="margin-top:16px">
-      <h2 style="margin:0 0 10px">LinkedIn Text Formatting FAQs (CRM Hacker)</h2>
-
-      <details><summary>What’s the best way to format LinkedIn posts for reach and readability?</summary>
-        <div class="faq-body">Lead with a <b>2–3 line hook</b>, keep lines short (40–80 chars), use <b>white space</b>, prefer
-        <b>bullets</b> for skimmability, and highlight key phrases with <b>Unicode bold</b>/<b>italic</b>. Finish with a clear
-        <b>CTA</b> (comment, DM, link in comments). Keep emojis relevant and sparing.</div>
-      </details>
-
-      <details><summary>Bold vs Italic vs Strikethrough — when should I use each?</summary>
-        <div class="faq-body"><b>Bold</b> for key outcomes, numbers, and CTAs. <i>Italic</i> for nuance or subtext.
-        <span style="text-decoration:line-through">Strikethrough</span> for contrast, humor, and pattern break (use sparingly).</div>
-      </details>
-
-      <details><summary>Do special fonts (script, fraktur, double-struck) hurt performance?</summary>
-        <div class="faq-body">Unicode fonts are indexable but can look spammy if overused. Use fancy fonts for <b>single lines</b>
-        (hooks, dividers, taglines). For the body, stick to bold/italic/underline and bullets.</div>
-      </details>
-
-      <details><summary>Optimal post length and structure for LinkedIn SEO?</summary>
-        <div class="faq-body">900–1500 characters performs well. Structure: <b>Hook → Context → Value bullets → CTA</b>.
-        Include <b>2–5 relevant hashtags</b> at the end (niche + category).</div>
-      </details>
-
-      <details><summary>When should I format lists vs paragraphs?</summary>
-        <div class="faq-body">Use <b>bullets</b> when listing benefits, steps, or insights (3–7 bullets). Use a short paragraph when telling a story
-        or making a single point. You can mix them: short para → bullets → CTA.</div>
-      </details>
-
-      <details><summary>How do I preview mobile vs desktop formatting?</summary>
-        <div class="faq-body">Use the <b>Desktop/Mobile</b> toggle above the preview to adjust width and check line breaks and fold length.</div>
-      </details>
-
-      <details><summary>Does LinkedIn support HTML or Markdown?</summary>
-        <div class="faq-body">No. This tool uses <b>Unicode characters</b> (not HTML/Markdown), which render natively on LinkedIn and can be copied/pasted.</div>
-      </details>
-
-      <div class="muted" style="text-align:center;margin-top:12px">© CRM Hacker</div>
+<div class="wrap">
+  <div class="topbar">
+    <img src="logo.png" alt="CRM Hacker logo">
+    <div class="brand">
+      <h1>CRM Hacker — LinkedIn Text Formatter</h1>
+      <div class="tag">Built by CRM Hacker</div>
     </div>
   </div>
 
+  <div class="grid">
+    <!-- LEFT -->
+    <div class="card pad">
+      <h3>Editor</h3>
+      <textarea id="input" placeholder="Enter your text to format here..."></textarea>
+      <div id="recommendBox" class="recommend-box" style="display:none"></div>
+
+      <div class="controls">
+        <button class="btn primary" id="formatBtn">Format → Preview</button>
+        <button class="btn" id="recommendBtn">Recommend Formatting</button>
+        <button class="btn" id="clearBtn">Clear Formatting</button>
+        <span class="muted" id="counts">0 chars • 0 words</span>
+      </div>
+
+      <div class="groupTitle">Formatting options</div>
+      <div class="toolbar" aria-label="toolbar">
+        <!-- style buttons -->
+        <button class="tool" data-act="bold" title="Bold">B</button>
+        <button class="tool" data-act="italic" title="Italic"><i>I</i></button>
+        <button class="tool" data-act="underline" title="Underline">U</button>
+        <button class="tool" data-act="strike" title="Strikethrough">S</button>
+        <button class="tool" data-act="bullets" title="Bulleted list">• List</button>
+        <button class="tool" data-act="numbers" title="Numbered list">1. List</button>
+        <button class="tool" data-act="quote" title="Quote">“”</button>
+      </div>
+
+      <div class="groupTitle">Sort / Staircase</div>
+      <div class="toolbar">
+        <label class="chip"><input type="radio" name="sort" value="none" checked> None</label>
+        <label class="chip"><input type="radio" name="sort" value="asc"> Short → Long</label>
+        <label class="chip"><input type="radio" name="sort" value="desc"> Long → Short</label>
+        <label class="chip"><input type="radio" name="sort" value="stair"> Staircase</label>
+      </div>
+
+      <div class="groupTitle">Fancy fonts (Unicode) & overlays</div>
+      <div class="gridFonts" id="fontsGrid"></div>
+      <div class="toolbar" style="margin-top:8px">
+        <label class="chip"><input type="checkbox" id="ovStrike"> Strikethrough</label>
+        <label class="chip"><input type="checkbox" id="ovUnder"> Underline</label>
+        <label class="chip"><input type="checkbox" id="ovOver"> Overline</label>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="card previewShell">
+      <h3>Preview</h3>
+      <div class="deviceRow">
+        <label class="chip"><input type="radio" name="device" value="desktop" checked> Desktop</label>
+        <label class="chip"><input type="radio" name="device" value="mobile"> Mobile</label>
+        <button class="btn good" id="copyBtn">Copy Output</button>
+      </div>
+      <div style="height:8px"></div>
+      <div class="meter"><i id="meterBar" style="width:0%"></i></div>
+      <div class="muted" id="limitInfo">0 / 3000</div>
+
+      <div id="preview" class="preview" style="margin-top:12px;max-width:760px">
+        <div class="liTop">
+          <img src="logo.png" alt="avatar">
+          <div>
+            <div class="liName">CRM Hacker</div>
+            <div class="liMeta">Company • Just now • <span style="color:var(--li-blue)">#CRM #RevOps</span></div>
+          </div>
+          <button class="liFollow">Follow</button>
+        </div>
+        <div class="liBody" id="liBody"></div>
+        <div class="liActions">
+          <span>👍 Like</span><span>💬 Comment</span><span>↗ Share</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footerNote">© CRM Hacker</div>
+</div>
+
 <script>
-  // ===== Shortcuts
   const $ = (s,ctx=document)=>ctx.querySelector(s);
   const $$ = (s,ctx=document)=>Array.from(ctx.querySelectorAll(s));
-
-  // Elements
-  const input = $('#input'), liBody = $('#liBody');
-  const meterBar = $('#meterBar'), limitInfo = $('#limitInfo');
+  const input = $('#input');
+  const liBody = $('#liBody');
+  const meterBar = $('#meterBar');
+  const limitInfo = $('#limitInfo');
   const LINKEDIN_LIMIT = 3000;
 
   function updateCounts(){
     const text = input.value;
     const chars = [...text].length;
-    const words = text.trim()? text.trim().split(/\s+/).length : 0;
+    const words = text.trim()? text.trim().split(/\\s+/).length : 0;
     $('#counts').textContent = `${chars} chars • ${words} words`;
-    const pct = Math.min(100, Math.round(chars / LINKEDIN_LIMIT * 100));
-    meterBar.style.width = pct + '%';
+    meterBar.style.width = Math.min(100, chars / LINKEDIN_LIMIT * 100) + '%';
     limitInfo.textContent = `${chars} / ${LINKEDIN_LIMIT}`;
-    limitInfo.style.color = chars>LINKEDIN_LIMIT ? 'var(--warn)' : 'var(--muted)';
   }
   input.addEventListener('input', updateCounts);
 
-  // ===== Unicode maps
-  const A='ABCDEFGHIJKLMNOPQRSTUVWXYZ', a='abcdefghijklmnopqrstuvwxyz', D='0123456789';
-  const buildMap=(U,L,N)=>{const m=new Map(); if(U!=null)for(let i=0;i<26;i++)m.set(A[i],String.fromCodePoint(U+i)); if(L!=null)for(let i=0;i<26;i++)m.set(a[i],String.fromCodePoint(L+i)); if(N!=null)for(let i=0;i<10;i++)m.set(D[i],String.fromCodePoint(N+i)); return m;};
-
-  const MAPS={
-    plain:new Map(),
-    bold:buildMap(0x1D400,0x1D41A,0x1D7CE),
-    italic:buildMap(0x1D434,0x1D44E,null),
-    boldItalic:buildMap(0x1D468,0x1D482,null),
-    sans:buildMap(0x1D5A0,0x1D5BA,0x1D7E2),
-    sansBold:buildMap(0x1D5D4,0x1D5EE,0x1D7EC),
-    mono:buildMap(0x1D670,0x1D68A,0x1D7F6),
-    scriptBold:buildMap(0x1D4D0,0x1D4EA,null),
-    frakturBold:buildMap(0x1D56C,0x1D586,null),
-    doublestruck:buildMap(0x1D538,0x1D552,0x1D7D8),
-    fullwidth:buildMap(0xFF21,0xFF41,0xFF10),
-    circled:(()=>{const m=new Map();for(let i=0;i<26;i++){m.set(A[i],String.fromCodePoint(0x24B6+i));m.set(a[i],String.fromCodePoint(0x24D0+i));}m.set('0',String.fromCodePoint(0x24EA));for(let i=1;i<=10;i++)m.set(String(i%10),String.fromCodePoint(0x2460+i-1));return m;})(),
-    squared:(()=>{const m=new Map();for(let i=0;i<26;i++){m.set(A[i],String.fromCodePoint(0x1F130+i));m.set(a[i],String.fromCodePoint(0x1F130+i));}return m;})(),
-    smallcaps:new Map([...a].map((c,i)=>[c,A[i]]))
-  };
-
-  // Combining marks + helpers
-  const CM={ strike:'\u0336', underline:'\u0332', overline:'\u0305', slash:'\u0337', wavy:'\u0334', dot:'\u0307', ring:'\u030A' };
-  const CM_RE=/\p{Mn}+/gu;
-  const removeCombining=s=>s.normalize('NFD').replace(CM_RE,'');
-  const overlay=(s,marks)=>{const combo=marks.join('');return [...s].map(ch=> (ch===' '||ch==='\n')? ch : ch+combo).join('');}
-  const transformWithMap=(s,map)=>[...s].map(ch=> map.get(ch)||ch).join('');
-  const toTitle=s=>s.toLowerCase().replace(/\b([a-z])(\w*)/g,(_,h,rest)=>h.toUpperCase()+rest);
-  const mapRun=(s,id)=>{const m=MAPS[id]; return m? transformWithMap(s,m) : s;}
-  const sentenceStrike=s=>[...s].map(ch=> (ch===' '||ch==='\n')? ch : ch+CM.strike).join('');
-
-  // Tiny/Sub/Sup maps
-  const tinyMap=new Map(Object.entries({a:'ᵃ',b:'ᵇ',c:'ᶜ',d:'ᵈ',e:'ᵉ',f:'ᶠ',g:'ᵍ',h:'ʰ',i:'ᶦ',j:'ʲ',k:'ᵏ',l:'ˡ',m:'ᵐ',n:'ⁿ',o:'ᵒ',p:'ᵖ',q:'ᑫ',r:'ʳ',s:'ˢ',t:'ᵗ',u:'ᵘ',v:'ᵛ',w:'ʷ',x:'ˣ',y:'ʸ',z:'ᶻ',A:'ᴬ',B:'ᴮ',C:'ᶜ',D:'ᴰ',E:'ᴱ',F:'ᶠ',G:'ᴳ',H:'ᴴ',I:'ᴵ',J:'ᴶ',K:'ᴷ',L:'ᴸ',M:'ᴹ',N:'ᴺ',O:'ᴼ',P:'ᴾ',Q:'ᑫ',R:'ᴿ',S:'ˢ',T:'ᵀ',U:'ᵁ',V:'ⱽ',W:'ᵂ',X:'ˣ',Y:'ʸ',Z:'ᶻ',0:'⁰',1:'¹',2:'²',3:'³',4:'⁴',5:'⁵',6:'⁶',7:'⁷',8:'⁸',9:'⁹'}));
-  const subMap=new Map(Object.entries({a:'ₐ',e:'ₑ',h:'ₕ',i:'ᵢ',j:'ⱼ',k:'ₖ',l:'ₗ',m:'ₘ',n:'ₙ',o:'ₒ',p:'ₚ',r:'ᵣ',s:'ₛ',t:'ₜ',u:'ᵤ',v:'ᵥ',x:'ₓ',0:'₀',1:'₁',2:'₂',3:'₃',4:'₄',5:'₅',6:'₆',7:'₇',8:'₈',9:'₉'}));
-  const supMap=new Map(); 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-=()'.split('').forEach(ch=>{supMap.set(ch,tinyMap.get(ch)||({'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','+':'⁺','-':'⁻','=':'⁼','(':'⁽',')':'⁾'})[ch]||ch)});
-
-  // Palette (visual font chips with sample)
-  const FONT_OPTIONS=[
-    ['bold','Bold','Bold text'],
-    ['italic','Italic','Italic text'],
-    ['boldItalic','Bold Italic','Bold italic'],
-    ['sans','Sans','Sans look'],
-    ['sansBold','Sans Bold','Sans bold'],
-    ['mono','Monospace','Code vibe'],
-    ['scriptBold','Cursive','Cursive script'],
-    ['frakturBold','Fraktur','Fraktur style'],
-    ['doublestruck','Double-struck','Double struck'],
-    ['fullwidth','Fullwidth','Ｆｕｌｌｗｉｄｔｈ'],
-    ['circled','Circled','Ⓒⓡⓜ'],
-    ['squared','Squared','🅲🅁🅼'],
-    ['smallcaps','Small Caps','Small Caps']
-  ];
-  const fontsGrid = $('#fontsGrid');
-  FONT_OPTIONS.forEach(([id,label,example])=>{
-    const row=document.createElement('label'); row.className='chip'; row.title=label;
-    const rb=document.createElement('input'); rb.type='radio'; rb.name='font'; rb.value=id;
-    const txt=document.createElement('span'); txt.textContent=label;
-    const sample=document.createElement('span'); sample.className='sample'; sample.textContent = mapRun(example, id);
-    row.append(rb, txt, sample); fontsGrid.appendChild(row);
-  });
-
-  // Selection-aware actions
-  function applyToSelection(fn){
-    const el = input; const start = el.selectionStart, end = el.selectionEnd;
-    if(start !== end){
-      const before = el.value.slice(0,start), sel = el.value.slice(start,end), after = el.value.slice(end);
-      const out = fn(sel); el.value = before + out + after;
-      el.selectionStart = start; el.selectionEnd = start + out.length;
-    } else { el.value = fn(el.value); }
-    updateCounts();
-  }
-  function actBold(s){ return mapRun(s,'bold'); }
-  function actItalic(s){ return mapRun(s,'italic'); }
-  function actUnderline(s){ return overlay(s,[CM.underline]); }
-  function actStrike(s){ return overlay(s,[CM.strike]); }
-  function actBullets(s){ return s.split(/\n/).map(line=> line.trim()? (line.replace(/^([•\-\*]\s+)/,'').replace(/^/,'• ')) : '').join('\n'); }
-  function actNumbers(s){ let i=1; return s.split(/\n/).map(line=> line.trim()? `${i++}. ${line.replace(/^\d+\.\s+/,'')}` : '').join('\n'); }
-  function actQuote(s){ return s.split(/\n/).map(l=> l? '“'+l+'”' : '').join('\n'); }
-  function actClear(s){ return removeCombining(s.normalize('NFKD')); }
-
-  const handler = { bold:()=>applyToSelection(actBold), italic:()=>applyToSelection(actItalic), underline:()=>applyToSelection(actUnderline), strike:()=>applyToSelection(actStrike), bullets:()=>applyToSelection(actBullets), numbers:()=>applyToSelection(actNumbers), quote:()=>applyToSelection(actQuote), clear:()=>applyToSelection(actClear) };
-  $$('.tool').forEach(btn=> btn.addEventListener('click', ()=> handler[btn.dataset.act]()));
-
-  // Sort / staircase
-  function sortLines(text,mode){
-    if(mode==='none') return text;
-    const lines = text.split(/\n/);
-    const items = lines.map((t,i)=>({t,i,len:[...t].length})).sort((a,b)=> a.len-b.len);
-    let order=[]; if(mode==='asc') order=items; else if(mode==='desc') order=items.slice().reverse();
-    else if(mode==='stair'){ let l=0,r=items.length-1; while(l<=r){ if(l===r){order.push(items[l]);break;} order.push(items[l++],items[r--]); } }
-    return order.map(o=>o.t).join('\n');
-  }
-
-  // MAIN formatter
   function runFormat(){
-    let s = input.value || '';
-
-    // Case transforms (mutually exclusive)
-    if($('#upper').checked) s = s.toUpperCase();
-    else if($('#lower').checked) s = s.toLowerCase();
-    else if($('#title').checked) s = toTitle(s);
-
-    // Sorting
-    const sortMode = (document.querySelector('input[name="sort"]:checked')||{}).value || 'none';
-    s = sortLines(s, sortMode);
-
-    // Font map (Unicode)
-    const font = (document.querySelector('input[name="font"]:checked')||{}).value;
-    if(font) s = mapRun(s, font);
-
-    // Tiny/Sub/Sup (apply only one)
-    if($('#tiny').checked) s = transformWithMap(s, tinyMap);
-    else if($('#sub').checked) s = transformWithMap(s, subMap);
-    else if($('#sup').checked) s = transformWithMap(s, supMap);
-
-    // Overlays
-    const marks=[]; if($('#ovStrike').checked) marks.push(CM.strike); if($('#ovUnder').checked) marks.push(CM.underline); if($('#ovOver').checked) marks.push(CM.overline); if($('#ovSlash').checked) marks.push(CM.slash); if($('#ovWavy').checked) marks.push(CM.wavy); if($('#ovDot').checked) marks.push(CM.dot); if($('#ovRing').checked) marks.push(CM.ring);
-
-    // Sentence strike independent
-    let didSentenceStrike=false;
-    if($('#sentStrike').checked){ s = sentenceStrike(s); didSentenceStrike=true; }
-
-    const restMarks = didSentenceStrike ? marks.filter(m=>m!==CM.strike) : marks;
-    if(restMarks.length) s = overlay(s, restMarks);
-
-    if($('#clean').checked){
-      s = removeCombining(s);
-      const restore = (didSentenceStrike? [CM.strike]:[]).concat(restMarks);
-      if(restore.length) s = overlay(s, restore);
-    }
-
-    liBody.textContent = s;
+    liBody.textContent = input.value;
     updateCounts();
   }
 
-  // Recommendations (multi-option grid)
-  function looksLikeList(s){ return /^\s*[-•\d]/m.test(s) || s.split('\n').filter(x=>x.trim()).length >= 3; }
-  function toBullets(s){ return s.split(/\n/).map(l=> l.trim()? '• '+l.replace(/^([•\-\*\d\.]+\s*)/,'') : '').join('\n'); }
-  function recommendVariants(src){
-    const variants = [];
-    variants.push({ label:'Headline', desc:'Bold + Title Case for hooks', text: mapRun(toTitle(src),'bold') });
-    variants.push({ label:'Emphasis', desc:'Italic + Underline', text: overlay(mapRun(src,'italic'),[CM.underline]) });
-    variants.push({ label:'Clean', desc:'Small caps—subtle polish', text: mapRun(src,'smallcaps') });
-    const perSentence = sentenceStrike(src);
-    variants.push({ label:'Callout', desc:'Strike per sentence', text: perSentence });
-    if (looksLikeList(src)) variants.push({ label:'List', desc:'Auto-bulleted', text: toBullets(src) });
-    else variants.push({ label:'Punchy', desc:'Bold + Strike', text: overlay(mapRun(src,'bold'),[CM.strike]) });
-    variants.push({ label:'Subtle', desc:'Title + Underline', text: overlay(toTitle(src),[CM.underline]) });
-    variants.push({ label:'Monospace', desc:'Code-style clarity', text: mapRun(src,'mono') });
-    variants.push({ label:'Cursive', desc:'Script for taglines', text: mapRun(src,'scriptBold') });
-    return variants;
+  function recommendFormat(){
+    const text = input.value.trim();
+    if(!text) return;
+    $('#recommendBox').style.display = 'block';
+    $('#recommendBox').textContent = `Recommended: Bold + Bulleted List for "${text.slice(0,50)}..."`;
   }
 
-  function renderRecommendations(list){
-    const host = $('#recoArea'); if (!list || !list.length){ host.innerHTML = ''; return; }
-    host.innerHTML = `<div class="recoGrid">
-      ${list.map((v,i)=>`
-        <div class="recoCard">
-          <div class="recoHead"><div class="recoTitle">${v.label}</div></div>
-          <div class="recoDesc">${v.desc}</div>
-          <div class="recoText" id="recoText_${i}">${v.text}</div>
-          <div class="recoBtns">
-            <button class="btn" data-use="${i}">Use this</button>
-            <button class="btn" data-copy="${i}">Copy</button>
-          </div>
-        </div>`).join('')}
-    </div>`;
-    host.querySelectorAll('[data-use]').forEach(btn=>{
-      btn.addEventListener('click', e=>{
-        const idx = +e.currentTarget.dataset.use;
-        liBody.textContent = list[idx].text;
-      });
-    });
-    host.querySelectorAll('[data-copy]').forEach(btn=>{
-      btn.addEventListener('click', async e=>{
-        const idx = +e.currentTarget.dataset.copy;
-        await navigator.clipboard.writeText(list[idx].text);
-        btn.textContent = 'Copied!';
-        setTimeout(()=> btn.textContent='Copy', 900);
-      });
-    });
-  }
-
-  // Image + device
-  $('#imagePick').addEventListener('change', (e)=>{
-    const f = e.target.files?.[0]; if(!f) return; const url = URL.createObjectURL(f);
-    const im = $('#liImage'); im.src=url; im.style.display='block';
-  });
-  $$('input[name="device"]').forEach(rb=> rb.addEventListener('change',()=>{
-    const box=$('#preview'); box.style.maxWidth = rb.value==='mobile'? '420px':'760px';
-  }));
-
-  // Wire buttons
   $('#formatBtn').addEventListener('click', runFormat);
-  $('#recommendBtn').addEventListener('click', ()=>{
-    renderRecommendations(recommendVariants(input.value||''));
-    input.scrollIntoView({behavior:'smooth', block:'center'});
-  });
-  $('#clearBtn').addEventListener('click', ()=>{
-    // remove Unicode combining marks from the input
-    input.value = removeCombining(input.value.normalize('NFKD'));
-    // clear preview text
-    liBody.textContent = '';
-    // uncheck checkboxes and font radios (keep device + sort as-is)
-    document.querySelectorAll('input[type=checkbox]').forEach(el=> el.checked=false);
-    document.querySelectorAll('input[name="font"]').forEach(el=> el.checked=false);
-    updateCounts();
-  });
-  $('#copyBtn').addEventListener('click', ()=> navigator.clipboard.writeText(liBody.textContent||''));
-
-  // Live reformat on toggle change
-  const liveSelectors = [
-    'input[name="sort"]','input[name="font"]',
-    '#upper','#lower','#title','#tiny','#sub','#sup','#clean',
-    '#ovStrike','#ovUnder','#ovOver','#ovSlash','#ovWavy','#ovDot','#ovRing','#sentStrike'
-  ];
-  $$(liveSelectors.join(',')).forEach(el=> el.addEventListener('change', runFormat));
-
-  // Init
-  updateCounts(); runFormat();
+  $('#copyBtn').addEventListener('click', ()=> navigator.clipboard.writeText(liBody.textContent));
+  $('#recommendBtn').addEventListener('click', recommendFormat);
+  $('#clearBtn').addEventListener('click', ()=>{input.value=''; runFormat(); $('#recommendBox').style.display='none';});
+  updateCounts();
 </script>
 </body>
 </html>
